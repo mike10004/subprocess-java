@@ -211,7 +211,9 @@ class ProcessMissionControl {
     private static void closeStreams(java.io.Closeable...streams) {
         for (java.io.Closeable stream : streams) {
             try {
-                stream.close();
+                if (stream != null) {
+                    stream.close();
+                }
             } catch (IOException ignore) {
             }
         }

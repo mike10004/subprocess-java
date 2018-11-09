@@ -1,13 +1,14 @@
 package io.github.mike10004.subprocess.test;
 
-import io.github.mike10004.subprocess.StreamControl;
-import io.github.mike10004.subprocess.ProcessTracker;
-import io.github.mike10004.subprocess.ProcessMonitor;
-import io.github.mike10004.subprocess.StreamContext;
-import io.github.mike10004.subprocess.ProcessResult;
-import io.github.mike10004.subprocess.Subprocess;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
+import io.github.mike10004.subprocess.ProcessMonitor;
+import io.github.mike10004.subprocess.ProcessResult;
+import io.github.mike10004.subprocess.ProcessTracker;
+import io.github.mike10004.subprocess.StreamContent;
+import io.github.mike10004.subprocess.StreamContext;
+import io.github.mike10004.subprocess.StreamControl;
+import io.github.mike10004.subprocess.Subprocess;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -70,7 +71,17 @@ public class ExternalPackageTest {
                 return null;
             }
         };
-        StreamContext<?, Void, Void> outputControl = StreamContext.predefinedAndOutputIgnored(ctx);
+        StreamContext<?, Void, Void> outputControl = new StreamContext<StreamControl, Void, Void>() {
+            @Override
+            public StreamControl produceControl() {
+                return ctx;
+            }
+
+            @Override
+            public StreamContent<Void, Void> transform(int exitCode, StreamControl context) {
+                return StreamContent.absent();
+            }
+        };
         ProcessMonitor<Void, Void> monitor = fixture.subprocess.launcher(CONTEXT).output(outputControl).launch();
         byte[] stdoutcontent = ByteStreams.toByteArray(pin);
         ProcessResult<Void, Void> result = monitor.await();

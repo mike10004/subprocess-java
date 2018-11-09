@@ -6,8 +6,16 @@ import java.io.InputStream;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Interface of a source of a byte stream.
+ */
 public interface StreamInput {
 
+    /**
+     * Opens an input stream.
+     * @return an open input stream
+     * @throws IOException on I/O error
+     */
     InputStream openStream() throws IOException;
 
     static StreamInput empty() {

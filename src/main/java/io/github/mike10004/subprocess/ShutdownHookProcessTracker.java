@@ -41,6 +41,7 @@ class ShutdownHookProcessTracker implements ProcessTracker {
         return destroyer.processes.size();
     }
 
+    @SuppressWarnings({"UnusedReturnValue", "SameParameterValue"})
     @VisibleForTesting
     List<Process> destroyAll(long timeout, TimeUnit unit) {
         return destroyer.destroyAll(timeout, unit);

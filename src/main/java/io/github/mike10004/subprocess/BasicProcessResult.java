@@ -22,6 +22,9 @@ class BasicProcessResult<SO, SE> implements ProcessResult<SO, SE> {
         return output;
     }
 
+    /**
+     * @see StreamContents#bothNull() 
+     */
     public static <SO, SE> BasicProcessResult<SO, SE> withNoOutput(int exitCode) {
         return new BasicProcessResult<>(exitCode, StreamContents.bothNull());
     }

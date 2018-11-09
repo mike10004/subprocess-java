@@ -32,7 +32,7 @@ public interface StreamContent<SO, SE> {
         return new MappedOutput<>(this, stdoutMap, stderrMap);
     }
 
-    static <SO, SE> StreamContent<SO, SE> empty() {
+    static <SO, SE> StreamContent<SO, SE> absent() {
         return StreamContents.bothNull();
     }
 }

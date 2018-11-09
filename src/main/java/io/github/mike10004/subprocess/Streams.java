@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
@@ -46,6 +45,7 @@ class Streams {
      * or implied. See the License for the specific language governing permissions and limitations under
      * the License.
      */
+    @SuppressWarnings("NullableProblems")
     private static final OutputStream NULL_OUTPUT_STREAM =
             new OutputStream() {
                 /** Discards the specified byte. */
@@ -182,71 +182,6 @@ class Streams {
         ByteArrayOutputStream out = new ByteArrayOutputStream(Math.max(32, in.available()));
         copy(in, out);
         return out.toByteArray();
-    }
-
-    /**
-     * Reads all bytes from an input stream into a byte array. The given expected size is used to
-     * create an initial byte array, but if the actual number of bytes read from the stream differs,
-     * the correct result will be returned anyway.
-     */
-    static byte[] toByteArray(InputStream in, int expectedSize) throws IOException {
-        byte[] bytes = new byte[expectedSize];
-        int remaining = expectedSize;
-
-        while (remaining > 0) {
-            int off = expectedSize - remaining;
-            int read = in.read(bytes, off, remaining);
-            if (read == -1) {
-                // end of stream before reading expectedSize bytes
-                // just return the bytes read so far
-                return Arrays.copyOf(bytes, off);
-            }
-            remaining -= read;
-        }
-
-        // bytes is now full
-        int b = in.read();
-        if (b == -1) {
-            return bytes;
-        }
-
-        // the stream was longer, so read the rest normally
-        FastByteArrayOutputStream out = new FastByteArrayOutputStream();
-        out.write(b); // write the byte we read when testing for end of stream
-        copy(in, out);
-
-        byte[] result = new byte[bytes.length + out.size()];
-        System.arraycopy(bytes, 0, result, 0, bytes.length);
-        out.writeTo(result, bytes.length);
-        return result;
-    }
-
-    /** BAOS that provides limited access to its internal byte array. */
-    private static final class FastByteArrayOutputStream extends ByteArrayOutputStream {
-        /**
-         * Writes the contents of the internal buffer to the given array starting at the given offset.
-         * Assumes the array has space to hold count bytes.
-         */
-        void writeTo(byte[] b, int off) {
-            System.arraycopy(buf, 0, b, off, count);
-        }
-    }
-
-    /**
-     * Reads and discards data from the given {@code InputStream} until the end of the stream is
-     * reached. Returns the total number of bytes read. Does not close the stream.
-     *
-     * @since 20.0
-     */
-    // @CanIgnoreReturnValue
-    public static long exhaust(InputStream in) throws IOException {
-        long total = 0;
-        long read;
-        byte[] buf = createBuffer();
-        while ((read = in.read(buf)) != -1) {
-            total += read;
-        }
-        return total;
     }
 
 }

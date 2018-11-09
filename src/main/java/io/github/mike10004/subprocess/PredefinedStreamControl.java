@@ -84,7 +84,7 @@ class PredefinedStreamControl implements StreamControl {
     /**
      * Returns an instance defining synthetic sources and sinks that do not capture
      * any output from the process and do not send any input to the process.
-     * @return
+     * @return a stream control
      */
     public static PredefinedStreamControl nullWithNullInput() {
         return NULL_WITH_NULL_INPUT;
@@ -115,14 +115,17 @@ class PredefinedStreamControl implements StreamControl {
             return stdin(null);
         }
 
+        @SuppressWarnings("unused")
         public Builder emptyStdin() {
             return stdin(StreamInput.empty());
         }
 
+        @SuppressWarnings("unused")
         public Builder stderrToDevNull() {
             return stderr(StreamOutput.abyss());
         }
 
+        @SuppressWarnings("unused")
         public Builder stdoutToDevNull() {
             return stdout(StreamOutput.abyss());
         }

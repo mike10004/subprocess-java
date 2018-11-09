@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static io.github.mike10004.subprocess.Preconditions.checkState;
-
 /**
  * Implementation of a process tracker that can be used in a try-with-resources
  * block. When execution exits the block, all the processes are destroyed

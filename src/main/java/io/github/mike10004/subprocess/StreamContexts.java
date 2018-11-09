@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,7 +24,7 @@ class StreamContexts {
     }
 
     public static StreamContext<? extends StreamControl, Void, Void> sinkhole() {
-        return StreamContext.predefined(PredefinedStreamControl.nullWithNullInput(), StreamContexts::noOutput);
+        return predefined(PredefinedStreamControl.nullWithNullInput(), StreamContexts::noOutput);
     }
 
     public static UniformStreamContext<? extends StreamControl, StreamInput> memoryByteSources(@Nullable StreamInput stdin) {
@@ -47,6 +48,56 @@ class StreamContexts {
             public FileStreamControl produceControl() {
                 return new FileStreamControl(stdoutFile, stderrFile, stdin);
             }
+        };
+    }
+
+    /**
+     * Creates a new stream context that ignores process output.
+     * @param streamControl  the stream control to use
+     * @param <C> stream control type
+     * @param <SO> type of captured standard output content
+     * @param <SE> type of captured standard error content
+     * @return the new context
+     */
+    public static <C extends StreamControl, SO, SE> StreamContext<C, SO, SE> predefinedAndOutputIgnored(C streamControl) {
+        return predefined(streamControl, StreamContexts::noOutput);
+    }
+
+    /**
+     * Creates a new stream context whose output content is supplied by the given suppliers.
+     * @param streamControl the stream control
+     * @param stdoutProvider the standard output content supplier
+     * @param stderrProvider the standard error content supplier
+     * @param <C> stream control type
+     * @param <SO> type of captured standard output content
+     * @param <SE> type of captured standard error content
+     * @return the new context
+     */
+    public static <C extends StreamControl, SO, SE> StreamContext<C, SO, SE> predefined(C streamControl, Supplier<? extends SO> stdoutProvider, Supplier<? extends SE> stderrProvider) {
+        return predefined(streamControl, () -> StreamContent.direct(stdoutProvider.get(), stderrProvider.get()));
+    }
+
+    /**
+     * Creates a new stream context whose output is supplied by the given supplier.
+     * @param streamControl the stream control
+     * @param outputter the standard output and error content supplier
+     * @param <C> stream control type
+     * @param <SO> type of captured standard output content
+     * @param <SE> type of captured standard error content
+     * @return the new context
+     */
+    public static <C extends StreamControl, SO, SE> StreamContext<C, SO, SE> predefined(C streamControl, Supplier<? extends StreamContent<SO, SE>> outputter) {
+        return new StreamContext<C, SO, SE>() {
+            @Override
+            public C produceControl() {
+                return streamControl;
+            }
+
+            @Override
+            public StreamContent<SO, SE> transform(int exitCode, C context) {
+                return outputter.get();
+            }
+
         };
     }
 
@@ -89,10 +140,10 @@ class StreamContexts {
     }
 
     public static StreamContext<? extends StreamControl, Void, Void> inheritOutputs() {
-        return StreamContext.predefined(PredefinedStreamControl.builder().inheritStderr().inheritStdout().build(), StreamContexts::noOutput);    }
+        return predefined(PredefinedStreamControl.builder().inheritStderr().inheritStdout().build(), StreamContexts::noOutput);    }
 
     public static StreamContext<? extends StreamControl, Void, Void> inheritAll() {
-        return StreamContext.predefined(PredefinedStreamControl.builder().inheritStdin().inheritStderr().inheritStdout().build(), StreamContexts::noOutput);
+        return predefined(PredefinedStreamControl.builder().inheritStdin().inheritStderr().inheritStdout().build(), StreamContexts::noOutput);
     }
 
     public static class FileStreamControl implements StreamControl {

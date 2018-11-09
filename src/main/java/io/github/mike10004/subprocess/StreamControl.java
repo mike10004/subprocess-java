@@ -11,8 +11,25 @@ import java.io.OutputStream;
  */
 public interface StreamControl {
 
+    /**
+     * Opens the stream where process standard output data is to be written.
+     * @return an open output stream
+     * @throws IOException on I/O error
+     */
     OutputStream openStdoutSink() throws IOException;
+
+    /**
+     * Opens the stream where process standard error data is to be written.
+     * @return an open output stream
+     * @throws IOException on I/O error
+     */
     OutputStream openStderrSink() throws IOException;
+
+    /**
+     * Opens the stream from which process standard input is to be read.
+     * @return an open input stream
+     * @throws IOException on I/O error
+     */
     @Nullable
     InputStream openStdinSource() throws IOException;
 

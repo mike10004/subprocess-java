@@ -71,7 +71,7 @@ public class SubprocessPipingTest extends SubprocessTestBase {
                 .stdout(stdoutPipe.asByteSink())
                 .noStdin() // read from file passed as argument
                 .build();
-        StreamContext<?, Void, String> outputControl = StreamContext.predefined(endpoints, nullSupplier(), () -> stderrBucket.decode(Charset.defaultCharset()));
+        StreamContext<?, Void, String> outputControl = StreamContexts.predefined(endpoints, nullSupplier(), () -> stderrBucket.decode(Charset.defaultCharset()));
         ProcessMonitor<Void, String> monitor = Tests.runningPythonFile(Tests.pyCat())
                 .arg(wastelandFile.getAbsolutePath())
                 .build()
@@ -107,7 +107,7 @@ public class SubprocessPipingTest extends SubprocessTestBase {
                 .stdout(stdoutPipe.asByteSink())
                 .stdin(stdinPipe.asByteSource())
                 .build();
-        StreamContext<?, Void, String> outputControl = StreamContext.predefined(endpoints, nullSupplier(), () -> stderrBucket.decode(Charset.defaultCharset()));
+        StreamContext<?, Void, String> outputControl = StreamContexts.predefined(endpoints, nullSupplier(), () -> stderrBucket.decode(Charset.defaultCharset()));
         ProcessMonitor<Void, String> monitor =Tests.runningPythonFile(Tests.pyReadInput())
                 .build()
                 .launcher(TRACKER)

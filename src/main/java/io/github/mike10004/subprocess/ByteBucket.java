@@ -13,6 +13,7 @@ class ByteBucket implements StreamOutput {
         this.collector = collector;
     }
 
+    @SuppressWarnings("RedundantThrows")
     @Override
     public OutputStream openStream() throws IOException {
         return collector;

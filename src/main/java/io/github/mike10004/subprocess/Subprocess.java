@@ -20,8 +20,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static io.github.mike10004.subprocess.Preconditions.checkArgument;
-import static io.github.mike10004.subprocess.Preconditions.checkNotNull;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -306,7 +304,8 @@ public class Subprocess {
         private final ProcessTracker processTracker;
         protected final StreamContext<?, SO, SE> streamContext;
 
-        private Launcher(ProcessTracker processTracker, StreamContext<?, SO, SE> streamContext) {
+        @VisibleForTesting
+        Launcher(ProcessTracker processTracker, StreamContext<?, SO, SE> streamContext) {
             this.processTracker = requireNonNull(processTracker);
             this.streamContext = requireNonNull(streamContext);
         }

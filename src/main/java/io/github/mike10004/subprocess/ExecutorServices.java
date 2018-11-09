@@ -6,8 +6,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.Supplier;
 
-import static io.github.mike10004.subprocess.Preconditions.checkArgument;
-
 class ExecutorServices {
 
     private ExecutorServices() {}

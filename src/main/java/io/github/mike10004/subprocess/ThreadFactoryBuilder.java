@@ -14,9 +14,6 @@
 
 package io.github.mike10004.subprocess;
 
-import static io.github.mike10004.subprocess.Preconditions.checkArgument;
-import static io.github.mike10004.subprocess.Preconditions.checkNotNull;
-
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -40,7 +37,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Kurt Alfred Kluever
  * @since 4.0
  */
-public final class ThreadFactoryBuilder {
+@SuppressWarnings("unused")
+final class ThreadFactoryBuilder {
     private String nameFormat = null;
     private Boolean daemon = null;
     private Integer priority = null;

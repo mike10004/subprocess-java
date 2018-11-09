@@ -52,7 +52,7 @@ class DestroyAttempts {
      * This attempt's {@link DestroyAttempt#result() result()} method will return
      * {@link DestroyResult#TERMINATED TERMINATED}.
      * @param <A> kill or term attempt type
-     * @return
+     * @return an attempt instance
      */
     @SuppressWarnings("unchecked")
     public static <A extends DestroyAttempt.KillAttempt & DestroyAttempt.TermAttempt> A terminated() {
