@@ -1,10 +1,10 @@
-package com.github.mike10004.nativehelper.test;
+package io.github.mike10004.subprocess.test;
 
 import io.github.mike10004.subprocess.ProcessResult;
 import io.github.mike10004.subprocess.ScopedProcessTracker;
 import io.github.mike10004.subprocess.Subprocess;
-import com.github.mike10004.nativehelper.test.Poller.PollOutcome;
-import com.github.mike10004.nativehelper.test.Poller.StopReason;
+import io.github.mike10004.subprocess.test.Poller.PollOutcome;
+import io.github.mike10004.subprocess.test.Poller.StopReason;
 import com.google.common.base.Strings;
 import com.google.common.base.Suppliers;
 import com.google.common.io.Files;

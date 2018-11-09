@@ -1,6 +1,5 @@
 package io.github.mike10004.subprocess;
 
-import com.github.mike10004.nativehelper.test.Tests;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -10,6 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.io.CharSource;
 import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
+import io.github.mike10004.subprocess.test.Tests;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.junit.Test;

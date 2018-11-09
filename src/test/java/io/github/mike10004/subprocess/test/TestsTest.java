@@ -1,4 +1,4 @@
-package com.github.mike10004.nativehelper.test;
+package io.github.mike10004.subprocess.test;
 
 import org.junit.Test;
 

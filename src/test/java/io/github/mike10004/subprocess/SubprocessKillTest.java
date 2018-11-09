@@ -1,6 +1,6 @@
 package io.github.mike10004.subprocess;
 
-import com.github.mike10004.nativehelper.test.Tests;
+import io.github.mike10004.subprocess.test.Tests;
 import org.junit.Assume;
 import org.junit.Test;
 

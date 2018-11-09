@@ -6,7 +6,6 @@ import io.github.mike10004.subprocess.ProcessMonitor;
 import io.github.mike10004.subprocess.StreamContext;
 import io.github.mike10004.subprocess.ProcessResult;
 import io.github.mike10004.subprocess.Subprocess;
-import com.github.mike10004.nativehelper.test.Tests;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;

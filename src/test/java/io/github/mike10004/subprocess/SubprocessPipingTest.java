@@ -1,8 +1,8 @@
 package io.github.mike10004.subprocess;
 
-import com.github.mike10004.nativehelper.test.Tests;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import io.github.mike10004.subprocess.test.Tests;
 import org.junit.Test;
 
 import java.io.BufferedReader;
