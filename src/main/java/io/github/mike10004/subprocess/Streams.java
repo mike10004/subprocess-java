@@ -14,6 +14,8 @@
 package io.github.mike10004.subprocess;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -184,4 +186,17 @@ class Streams {
         return out.toByteArray();
     }
 
+    static class FileStreamInput implements StreamInput {
+
+        private final File file;
+
+        public FileStreamInput(File file) {
+            this.file = requireNonNull(file);
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return new FileInputStream(file);
+        }
+    }
 }

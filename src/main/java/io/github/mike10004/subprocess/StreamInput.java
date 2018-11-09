@@ -1,6 +1,7 @@
 package io.github.mike10004.subprocess;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,5 +32,9 @@ public interface StreamInput {
         try (InputStream in = openStream()) {
             return Streams.toByteArray(in);
         }
+    }
+
+    static StreamInput fromFile(File file) {
+        return new Streams.FileStreamInput(file);
     }
 }
