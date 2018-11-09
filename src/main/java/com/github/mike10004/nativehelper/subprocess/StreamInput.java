@@ -18,4 +18,10 @@ public interface StreamInput {
         requireNonNull(bytes);
         return () -> new ByteArrayInputStream(bytes);
     }
+
+    default byte[] read() throws IOException {
+        try (InputStream in = openStream()) {
+            return Streams.toByteArray(in);
+        }
+    }
 }

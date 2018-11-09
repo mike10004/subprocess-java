@@ -1,0 +1,3 @@
+This directory contains Python programs used for testing subprocess management.
+
+Program filenames start with nht_ to make them easier to grep in `ps aux` output.
