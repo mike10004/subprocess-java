@@ -15,12 +15,24 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <skip.surefire.tests>false</skip.surefire.tests>
         <slf4j.version>1.7.25</slf4j.version>
+        <python.executable>python</python.executable>
     </properties>
     <profiles>
         <profile>
             <id>skip-tests</id>
             <properties>
                 <skip.surefire.tests>true</skip.surefire.tests>
+            </properties>
+        </profile>
+        <profile>
+            <id>multiple-python-environment</id>
+            <activation>
+                <file>
+                    <exists>/usr/bin/python3</exists>
+                </file>
+            </activation>
+            <properties>
+                <python.executable>python3</python.executable>
             </properties>
         </profile>
     </profiles>
@@ -126,6 +138,11 @@
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>2.2</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>1.6.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -172,6 +189,36 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>render-readme</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${python.executable}</executable>
+                            <arguments>
+                                <argument>${project.basedir}/src/main/site/render_readme.py</argument>
+                                <argument>--snippet-sources</argument>
+                                <argument>${project.basedir}/src/test/java/io/github/mike10004/subprocess/test/ReadmeExamples.java</argument>
+                                <argument>--define</argument>
+                                <argument>project_groupId=${project.groupId}</argument>
+                                <argument>--define</argument>
+                                <argument>project_artifactId=${project.artifactId}</argument>
+                                <argument>--define</argument>
+                                <argument>project_version=${project.version}</argument>
+                                <argument>--output</argument>
+                                <argument>${project.basedir}/README.md</argument>
+                                <argument>${project.basedir}/readme.src.md</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <resources>
@@ -251,6 +298,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>23.6-jre</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
