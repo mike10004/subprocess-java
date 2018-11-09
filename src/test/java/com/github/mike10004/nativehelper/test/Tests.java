@@ -1,8 +1,8 @@
 package com.github.mike10004.nativehelper.test;
 
-import com.github.mike10004.nativehelper.subprocess.ProcessResult;
-import com.github.mike10004.nativehelper.subprocess.ScopedProcessTracker;
-import com.github.mike10004.nativehelper.subprocess.Subprocess;
+import io.github.mike10004.subprocess.ProcessResult;
+import io.github.mike10004.subprocess.ScopedProcessTracker;
+import io.github.mike10004.subprocess.Subprocess;
 import com.github.mike10004.nativehelper.test.Poller.PollOutcome;
 import com.github.mike10004.nativehelper.test.Poller.StopReason;
 import com.google.common.base.Strings;
