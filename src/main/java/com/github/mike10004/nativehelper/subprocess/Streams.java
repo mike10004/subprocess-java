@@ -1,12 +1,13 @@
-package com.google.common.io;
+package com.github.mike10004.nativehelper.subprocess;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import static java.util.Objects.requireNonNull;
 
-public class ByteStreams {
+class Streams {
 
-    private ByteStreams() {}
+    private Streams() {}
 
     public static OutputStream nullOutputStream() {
         return NULL_OUTPUT_STREAM;

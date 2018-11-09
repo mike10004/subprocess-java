@@ -1,9 +1,5 @@
 package com.github.mike10004.nativehelper.subprocess;
 
-import com.google.common.io.ByteSink;
-import com.google.common.io.ByteSource;
-import com.google.common.io.ByteStreams;
-
 import javax.annotation.Nullable;
 import java.io.FilterInputStream;
 import java.io.FilterOutputStream;
@@ -22,21 +18,21 @@ class PredefinedStreamControl implements StreamControl {
     /**
      * Sink for bytes read from the process standard output stream.
      */
-    private final ByteSink stdout;
+    private final StreamOutput stdout;
 
     /**
      * Sink for bytes read from the process standard error stream.
      */
-    private final ByteSink stderr;
+    private final StreamOutput stderr;
 
     /**
      * Source of bytes to supply on the process's standard input stream. Can be null
      * if nothing is to be sent to the process.
      */
     @Nullable
-    private  final ByteSource stdin;
+    private  final StreamInput stdin;
 
-    public PredefinedStreamControl(ByteSink stdout, ByteSink stderr, @Nullable ByteSource stdin) {
+    public PredefinedStreamControl(StreamOutput stdout, StreamOutput stderr, @Nullable StreamInput stdin) {
         this.stdin = stdin;
         this.stdout = requireNonNull(stdout);
         this.stderr = requireNonNull(stderr);
@@ -100,17 +96,17 @@ class PredefinedStreamControl implements StreamControl {
     }
 
     private static final PredefinedStreamControl NULL_WITH_NULL_INPUT = builder().build();
-    private static final PredefinedStreamControl NULL_WITH_EMPTY_INPUT = builder().stdin(ByteSource.empty()).build();
+    private static final PredefinedStreamControl NULL_WITH_EMPTY_INPUT = builder().stdin(StreamInput.empty()).build();
 
     /**
      * Builder of instances. By default, no output is captured
      * from the process and no input is sent to the process.
      */
     public static final class Builder {
-        private ByteSink stdout = ByteSink.abyss();
-        private ByteSink stderr = ByteSink.abyss();
+        private StreamOutput stdout = StreamOutput.abyss();
+        private StreamOutput stderr = StreamOutput.abyss();
         @Nullable
-        private ByteSource stdin = null;
+        private StreamInput stdin = null;
 
         private Builder() {
         }
@@ -120,34 +116,34 @@ class PredefinedStreamControl implements StreamControl {
         }
 
         public Builder emptyStdin() {
-            return stdin(ByteSource.empty());
+            return stdin(StreamInput.empty());
         }
 
         public Builder stderrToDevNull() {
-            return stderr(ByteSink.abyss());
+            return stderr(StreamOutput.abyss());
         }
 
         public Builder stdoutToDevNull() {
-            return stdout(ByteSink.abyss());
+            return stdout(StreamOutput.abyss());
         }
 
-        public Builder stdout(ByteSink val) {
+        public Builder stdout(StreamOutput val) {
             stdout = requireNonNull(val);
             return this;
         }
 
-        public Builder stderr(ByteSink val) {
+        public Builder stderr(StreamOutput val) {
             stderr = requireNonNull(val);
             return this;
         }
 
-        public Builder stdin(@Nullable ByteSource val) {
+        public Builder stdin(@Nullable StreamInput val) {
             stdin = val;
             return this;
         }
 
         public Builder inheritStdin() {
-            return stdin(new ByteSource() {
+            return stdin(new StreamInput() {
                 @Override
                 public InputStream openStream() {
                     return nonclosing(System.in);
@@ -156,7 +152,7 @@ class PredefinedStreamControl implements StreamControl {
         }
 
         public Builder inheritStderr() {
-            return stderr(new ByteSink() {
+            return stderr(new StreamOutput() {
                 @Override
                 public OutputStream openStream() {
                     return nonclosing(System.err);
@@ -165,7 +161,7 @@ class PredefinedStreamControl implements StreamControl {
         }
 
         public Builder inheritStdout() {
-            return stdout(new ByteSink() {
+            return stdout(new StreamOutput() {
                 @Override
                 public OutputStream openStream() {
                     return nonclosing(System.out);

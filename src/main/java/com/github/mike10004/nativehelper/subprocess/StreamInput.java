@@ -1,4 +1,4 @@
-package com.google.common.io;
+package com.github.mike10004.nativehelper.subprocess;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -6,15 +6,15 @@ import java.io.InputStream;
 
 import static java.util.Objects.requireNonNull;
 
-public interface ByteSource {
+public interface StreamInput {
 
     InputStream openStream() throws IOException;
 
-    static ByteSource empty() {
+    static StreamInput empty() {
         return () -> new ByteArrayInputStream(new byte[0]);
     }
 
-    static ByteSource wrap(byte[] bytes) {
+    static StreamInput wrap(byte[] bytes) {
         requireNonNull(bytes);
         return () -> new ByteArrayInputStream(bytes);
     }

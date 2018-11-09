@@ -1,13 +1,11 @@
 package com.github.mike10004.nativehelper.subprocess;
 
-import com.google.common.io.ByteSink;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-class ByteBucket implements ByteSink {
+class ByteBucket implements StreamOutput {
 
     private final ByteArrayOutputStream collector;
 

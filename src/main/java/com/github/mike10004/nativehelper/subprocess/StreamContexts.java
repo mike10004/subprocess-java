@@ -1,7 +1,6 @@
 package com.github.mike10004.nativehelper.subprocess;
 
 import com.github.mike10004.nativehelper.subprocess.StreamContext.UniformStreamContext;
-import com.google.common.io.ByteSource;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -27,11 +26,11 @@ class StreamContexts {
         return StreamContext.predefined(PredefinedStreamControl.nullWithNullInput(), StreamContexts::noOutput);
     }
 
-    public static UniformStreamContext<? extends StreamControl, ByteSource> memoryByteSources(@Nullable ByteSource stdin) {
-        return byteArrays(stdin).map(ByteSource::wrap);
+    public static UniformStreamContext<? extends StreamControl, StreamInput> memoryByteSources(@Nullable StreamInput stdin) {
+        return byteArrays(stdin).map(StreamInput::wrap);
     }
 
-    public static UniformStreamContext<? extends StreamControl, File> outputTempFiles(Path directory, @Nullable ByteSource stdin) {
+    public static UniformStreamContext<? extends StreamControl, File> outputTempFiles(Path directory, @Nullable StreamInput stdin) {
         return new FileStreamContext() {
             @Override
             public FileStreamControl produceControl() throws IOException {
@@ -42,7 +41,7 @@ class StreamContexts {
         };
     }
 
-    public static UniformStreamContext<? extends StreamControl, File> outputFiles(File stdoutFile, File stderrFile, @Nullable ByteSource stdin) {
+    public static UniformStreamContext<? extends StreamControl, File> outputFiles(File stdoutFile, File stderrFile, @Nullable StreamInput stdin) {
         return new FileStreamContext() {
             @Override
             public FileStreamControl produceControl() {
@@ -57,11 +56,11 @@ class StreamContexts {
         public final ByteBucket stdout;
         public final ByteBucket stderr;
 
-        public BucketContext(@Nullable ByteSource stdin) {
+        public BucketContext(@Nullable StreamInput stdin) {
             this(ByteBucket.withInitialCapacity(256), ByteBucket.withInitialCapacity(256), stdin);
         }
 
-        public BucketContext(ByteBucket stdout, ByteBucket stderr, @Nullable ByteSource stdin) {
+        public BucketContext(ByteBucket stdout, ByteBucket stderr, @Nullable StreamInput stdin) {
             super(stdout, stderr, stdin);
             this.stdout = requireNonNull(stdout);
             this.stderr = requireNonNull(stderr);
@@ -70,7 +69,7 @@ class StreamContexts {
 
     }
 
-    public static UniformStreamContext<? extends StreamControl, byte[]> byteArrays(@Nullable ByteSource stdin) {
+    public static UniformStreamContext<? extends StreamControl, byte[]> byteArrays(@Nullable StreamInput stdin) {
         return new UniformStreamContext<BucketContext, byte[]>() {
             @Override
             public BucketContext produceControl() {
@@ -84,7 +83,7 @@ class StreamContexts {
         };
     }
 
-    public static UniformStreamContext<? extends StreamControl, String> strings(Charset charset, @Nullable ByteSource stdin) {
+    public static UniformStreamContext<? extends StreamControl, String> strings(Charset charset, @Nullable StreamInput stdin) {
         requireNonNull(charset);
         return byteArrays(stdin).map(bytes -> new String(bytes, charset));
     }
@@ -99,9 +98,9 @@ class StreamContexts {
     public static class FileStreamControl implements StreamControl {
         private final File stdoutFile, stderrFile;
         @Nullable
-        private final ByteSource stdin;
+        private final StreamInput stdin;
 
-        public FileStreamControl(File stdoutFile, File stderrFile, @Nullable ByteSource stdin) {
+        public FileStreamControl(File stdoutFile, File stderrFile, @Nullable StreamInput stdin) {
             this.stdoutFile = requireNonNull(stdoutFile);
             this.stderrFile = requireNonNull(stderrFile);
             this.stdin = stdin;

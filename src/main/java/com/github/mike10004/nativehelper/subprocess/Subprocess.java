@@ -1,7 +1,6 @@
 package com.github.mike10004.nativehelper.subprocess;
 
 import com.github.mike10004.nativehelper.subprocess.StreamContext.UniformStreamContext;
-import com.google.common.io.ByteSource;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -371,7 +370,7 @@ public class Subprocess {
          * process standard output and standard error streams.
          * @param charset encoding of bytes on the process standard output and error streams
          * @return a new launcher instance
-         * @see #outputStrings(Charset, ByteSource)
+         * @see #outputStrings(Charset, StreamInput)
          */
         public UniformLauncher<String> outputStrings(Charset charset) {
             requireNonNull(charset, "charset");
@@ -386,7 +385,7 @@ public class Subprocess {
          * @param stdin source providing bytes to be written on process standard input stream; may be null
          * @return a new launcher instance
          */
-        public UniformLauncher<String> outputStrings(Charset charset, @Nullable ByteSource stdin) {
+        public UniformLauncher<String> outputStrings(Charset charset, @Nullable StreamInput stdin) {
             requireNonNull(charset, "charset");
             return output(StreamContexts.strings(charset, stdin));
         }
@@ -394,7 +393,7 @@ public class Subprocess {
         /**
          * Returns a new launcher that captures process standard output and error as byte arrays.
          * @return a new launcher instance
-         * @see #outputInMemory(ByteSource)
+         * @see #outputInMemory(StreamInput)
          */
         @SuppressWarnings("unused")
         public UniformLauncher<byte[]> outputInMemory() {
@@ -406,7 +405,7 @@ public class Subprocess {
          * @param stdin source providing bytes to be written on process standard input stream; may be null
          * @return a new launcher instance
          */
-        public UniformLauncher<byte[]> outputInMemory(@Nullable ByteSource stdin) {
+        public UniformLauncher<byte[]> outputInMemory(@Nullable StreamInput stdin) {
             UniformStreamContext<?, byte[]> m = StreamContexts.byteArrays(stdin);
             return output(m);
         }
@@ -438,7 +437,7 @@ public class Subprocess {
          * @param stdin source providing bytes to be written on process standard input stream; may be null
          * @return a new launcher instance
          */
-        public UniformLauncher<File> outputFiles(File stdoutFile, File stderrFile, @Nullable ByteSource stdin) {
+        public UniformLauncher<File> outputFiles(File stdoutFile, File stderrFile, @Nullable StreamInput stdin) {
             return output(StreamContexts.outputFiles(stdoutFile, stderrFile, stdin));
         }
 
@@ -448,7 +447,7 @@ public class Subprocess {
          * @param stdoutFile the file to which standard output content is to be written
          * @param stderrFile the file to which standard error content is to be written
          * @return a new launcher instance
-         * @see #outputFiles(File, File, ByteSource)
+         * @see #outputFiles(File, File, StreamInput)
          */
         public UniformLauncher<File> outputFiles(File stdoutFile, File stderrFile) {
             return outputFiles(stdoutFile, stderrFile, null);
@@ -471,7 +470,7 @@ public class Subprocess {
          * @param stdin source providing bytes to be written on process standard input stream; may be null
          * @return a new launcher instance
          */
-        public UniformLauncher<File> outputTempFiles(Path directory, @Nullable ByteSource stdin) {
+        public UniformLauncher<File> outputTempFiles(Path directory, @Nullable StreamInput stdin) {
             return output(StreamContexts.outputTempFiles(directory, stdin));
         }
     }
