@@ -214,7 +214,7 @@
                                 <argument>project_version=${project.version}</argument>
                                 <argument>--output</argument>
                                 <argument>${project.basedir}/README.md</argument>
-                                <argument>${project.basedir}/readme.src.md</argument>
+                                <argument>${project.basedir}/src/main/site/readme.src.md</argument>
                             </arguments>
                         </configuration>
                     </execution>
