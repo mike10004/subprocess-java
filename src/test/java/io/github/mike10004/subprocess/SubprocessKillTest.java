@@ -16,6 +16,11 @@ public class SubprocessKillTest extends SubprocessTestBase {
     @Rule
     public Timeout timeout = Tests.Timeouts.mediumRule();
 
+    public SubprocessKillTest(int trial, Timeout timeout) {
+        super(trial);
+        this.timeout = timeout;
+    }
+
     private static Subprocess signalProgram(boolean swallowSigterm, File pidFile) {
         Subprocess.Builder builder = Tests.runningPythonFile(Tests.pySignalListener());
         builder.args("--pidfile", pidFile.getAbsolutePath());

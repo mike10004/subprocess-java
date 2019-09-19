@@ -30,6 +30,10 @@ import static org.junit.Assert.*;
 
 public class SubprocessTest extends SubprocessTestBase {
 
+    public SubprocessTest(int trial) {
+        super(trial);
+    }
+
     @Test
     public void launch_true() throws Exception {
         int exitCode = Tests.runningPythonFile(pyTrue()).build()

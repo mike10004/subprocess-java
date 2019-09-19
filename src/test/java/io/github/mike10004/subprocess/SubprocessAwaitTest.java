@@ -16,6 +16,11 @@ public class SubprocessAwaitTest extends SubprocessTestBase {
     @Rule
     public Timeout timeout = Tests.Timeouts.mediumRule();
 
+    public SubprocessAwaitTest(int trial, Timeout timeout) {
+        super(trial);
+        this.timeout = timeout;
+    }
+
     @Test
     public void awaitWithTimeout() throws Exception {
         try {

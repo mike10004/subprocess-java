@@ -27,6 +27,10 @@ public class SubprocessPipingTest extends SubprocessTestBase {
     @Rule
     public Timeout timeout = Tests.Timeouts.mediumRule();
 
+    public SubprocessPipingTest(int trial) {
+        super(trial);
+    }
+
     @Test
     public void launch_readInput_piped() throws Exception {
         Charset charset = UTF_8;

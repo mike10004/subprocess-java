@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,6 +30,7 @@ public abstract class SubprocessTestBase {
 
     private volatile boolean testFailed;
     private volatile Description description;
+    protected final int trial;
 
     @Rule
     public final TestWatcher testWatcher = new TestWatcher() {
@@ -41,6 +44,10 @@ public abstract class SubprocessTestBase {
             testFailed = true;
         }
     };
+
+    public SubprocessTestBase(int trial) {
+        this.trial = trial;
+    }
 
     private ShutdownHookProcessTracker getTracker() {
         return (ShutdownHookProcessTracker) TRACKER;
@@ -69,7 +76,7 @@ public abstract class SubprocessTestBase {
     @Parameters
     public static List<Object[]> params() {
         int numTrials = Tests.getNumTrials();
-        return Arrays.asList(new Object[numTrials][0]);
+        return IntStream.range(0, numTrials).mapToObj(t -> new Object[]{t}).collect(Collectors.toList());
     }
 
     protected static <T> Supplier<T> nullSupplier() {
