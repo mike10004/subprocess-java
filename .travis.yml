@@ -1,0 +1,8 @@
+os:
+  - linux
+language: java
+jdk: oraclejdk11
+notifications:
+  email: false
+before_script: mvn --quiet dependency:go-offline
+script: mvn --quiet --batch-mode verify
