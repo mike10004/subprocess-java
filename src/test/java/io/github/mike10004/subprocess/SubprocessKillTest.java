@@ -14,11 +14,10 @@ import static org.junit.Assert.assertEquals;
 public class SubprocessKillTest extends SubprocessTestBase {
 
     @Rule
-    public Timeout timeout = Tests.Timeouts.mediumRule();
+    public final Timeout timeout = Tests.Timeouts.mediumRule();
 
-    public SubprocessKillTest(int trial, Timeout timeout) {
+    public SubprocessKillTest(int trial) {
         super(trial);
-        this.timeout = timeout;
     }
 
     private static Subprocess signalProgram(boolean swallowSigterm, File pidFile) {

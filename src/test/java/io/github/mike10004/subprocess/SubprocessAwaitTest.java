@@ -14,11 +14,10 @@ import static org.junit.Assert.assertNull;
 public class SubprocessAwaitTest extends SubprocessTestBase {
 
     @Rule
-    public Timeout timeout = Tests.Timeouts.mediumRule();
+    public final Timeout timeout = Tests.Timeouts.mediumRule();
 
-    public SubprocessAwaitTest(int trial, Timeout timeout) {
+    public SubprocessAwaitTest(int trial) {
         super(trial);
-        this.timeout = timeout;
     }
 
     @Test

@@ -4,5 +4,7 @@ language: java
 jdk: oraclejdk11
 notifications:
   email: false
-before_script: mvn --quiet --batch-mode dependency:go-offline
+before_install: true
+install: mvn --quiet --batch-mode dependency:go-offline
+before_script: true
 script: mvn --batch-mode verify
