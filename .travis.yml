@@ -1,10 +1,11 @@
 os:
   - linux
+  - windows
 language: java
-jdk: oraclejdk11
+jdk: openjdk11
 notifications:
   email: false
 before_install: true
-install: mvn --quiet --batch-mode dependency:go-offline
+install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true --batch-mode --show-version --quiet
 before_script: true
 script: mvn --batch-mode verify
