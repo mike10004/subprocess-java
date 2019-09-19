@@ -24,8 +24,8 @@ public class ProcessMissionControlTest {
         ByteBucket stdout = ByteBucket.create(), stderr = ByteBucket.create();
         PredefinedStreamControl endpoints = new PredefinedStreamControl(stdout, stderr, null);
         ProcessMissionControl.Execution<?, ?> execution = executor.launch(endpoints, exitCode -> ProcessResult.direct(exitCode, null, null));
-        Integer exitCode = execution.getFuture().get().exitCode();
-        assertEquals("exitcode", 0, exitCode.intValue());
+        int exitCode = execution.getFuture().get().exitCode();
+        assertEquals("exitcode", 0, exitCode);
         String actual = new String(stdout.dump(), US_ASCII);
         assertEquals("stdout", expected, actual.trim());
     }

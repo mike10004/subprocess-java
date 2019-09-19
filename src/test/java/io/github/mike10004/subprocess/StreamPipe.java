@@ -2,6 +2,7 @@ package io.github.mike10004.subprocess;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -36,14 +37,10 @@ public abstract class StreamPipe<F0 extends Closeable, T0 extends Closeable> {
         return componentPair.to;
     }
 
-    @SuppressWarnings("RedundantThrows")
-    public F0 connect() throws IOException, InterruptedException {
-        latch.await();
-        checkState(componentPair != null, "BUG: components not yet created");
-        return componentPair.from;
+    public F0 connect(Duration timeout) throws IOException, InterruptedException {
+        return connect(timeout.toMillis(), TimeUnit.MILLISECONDS);
     }
 
-    @SuppressWarnings("RedundantThrows")
     public F0 connect(long timeout, TimeUnit timeUnit) throws IOException, InterruptedException {
         boolean succeeded = latch.await(timeout, timeUnit);
         if (!succeeded) {

@@ -1,5 +1,6 @@
 package io.github.mike10004.subprocess;
 
+import io.github.mike10004.subprocess.test.Tests;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
@@ -65,21 +66,9 @@ public abstract class SubprocessTestBase {
         }
     }
 
-    private static int getNumTrials() {
-        String trialsStr = System.getenv("SUBPROCESS_TESTS_TRIALS");
-        if (trialsStr != null && !trialsStr.isEmpty()) {
-            try {
-                return Integer.parseInt(trialsStr);
-            } catch (RuntimeException e) {
-                System.err.format("failed to parse %s: %s%n", trialsStr, e);
-            }
-        }
-        return 1;
-    }
-
     @Parameters
     public static List<Object[]> params() {
-        int numTrials = getNumTrials();
+        int numTrials = Tests.getNumTrials();
         return Arrays.asList(new Object[numTrials][0]);
     }
 

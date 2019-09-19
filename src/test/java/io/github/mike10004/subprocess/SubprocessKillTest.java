@@ -2,13 +2,19 @@ package io.github.mike10004.subprocess;
 
 import io.github.mike10004.subprocess.test.Tests;
 import org.junit.Assume;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 
 import java.io.File;
 
+import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.junit.Assert.assertEquals;
 
 public class SubprocessKillTest extends SubprocessTestBase {
+
+    @Rule
+    public Timeout timeout = Tests.Timeouts.mediumRule();
 
     private static Subprocess signalProgram(boolean swallowSigterm, File pidFile) {
         Subprocess.Builder builder = Tests.runningPythonFile(Tests.pySignalListener());
@@ -19,9 +25,7 @@ public class SubprocessKillTest extends SubprocessTestBase {
         return builder.build();
     }
 
-    private static final long STD_TIMEOUT = 3000L;
-
-    @Test(timeout = STD_TIMEOUT)
+    @Test
     public void destroyWithSigKill() throws Exception {
         /*
          * Normally, we run our nht_signal_listener.py program here and specify that it should swallow SIGTERM, which
@@ -51,7 +55,7 @@ public class SubprocessKillTest extends SubprocessTestBase {
         }
     }
 
-    @Test(timeout = STD_TIMEOUT)
+    @Test
     public void destroyWithSigTerm() throws Exception {
         File pidFile = File.createTempFile("SubprocessKillTest", ".pid");
         ProcessMonitor<?, ?> monitor = signalProgram(false, pidFile)
@@ -59,7 +63,7 @@ public class SubprocessKillTest extends SubprocessTestBase {
                 .inheritOutputStreams()
                 .launch();
         System.out.println("waiting for pid to be printed...");
-        String pid = Tests.readWhenNonempty(pidFile);
+        String pid = Tests.readWhenNonempty(pidFile, 1, US_ASCII);
         System.out.format("pid printed: %s%n", pid);
         DestroyAttempt.TermAttempt termAttempt = monitor.destructor().sendTermSignal().await();
         assertEquals("term attempt result", DestroyResult.TERMINATED, termAttempt.result());

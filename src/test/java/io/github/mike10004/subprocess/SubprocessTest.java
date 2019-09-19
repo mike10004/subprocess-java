@@ -312,27 +312,6 @@ public class SubprocessTest extends SubprocessTestBase {
         assertEquals("lines", ImmutableList.of(line), lines);
     }
 
-    @Test(timeout = 5000L)
-    public void awaitWithTimeout() throws Exception {
-        try {
-            System.out.println("awaitWithTimeout");
-            ProcessMonitor<?, ?> monitor = Tests.runningPythonFile(Tests.pySignalListener())
-                    .build().launcher(TRACKER).launch();
-            ProcessResult<?, ?> result = null;
-            try {
-                result = monitor.await(100, TimeUnit.MILLISECONDS);
-            } catch (TimeoutException ignore) {
-            }
-            assertNull("result should not have been assigned", result);
-            DestroyAttempt term = monitor.destructor().sendTermSignal().await();
-            assertEquals("term result", DestroyResult.TERMINATED, term.result());
-        } catch (UnsupportedOperationException e) {
-            System.err.println("awaitWithTimeout: UnsupportedOperationException");
-            e.printStackTrace(System.err);
-            throw e;
-        }
-    }
-
     @Test
     public void killRemovesFromTracker() throws Exception {
         Map<Process, Boolean> processes = Collections.synchronizedMap(new HashMap<>());

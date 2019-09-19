@@ -3,7 +3,9 @@ package io.github.mike10004.subprocess;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import io.github.mike10004.subprocess.test.Tests;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,7 +24,10 @@ import static org.junit.Assert.assertEquals;
 
 public class SubprocessPipingTest extends SubprocessTestBase {
 
-    @Test(timeout = 5000L)
+    @Rule
+    public Timeout timeout = Tests.Timeouts.mediumRule();
+
+    @Test
     public void launch_readInput_piped() throws Exception {
         Charset charset = UTF_8;
         StreamPipeSource pipe = new StreamPipeSource();
@@ -32,7 +37,7 @@ public class SubprocessPipingTest extends SubprocessTestBase {
                 .outputStrings(charset, pipe.asByteSource())
                 .launch();
         List<String> lines = Arrays.asList("foo", "bar", "baz", "");
-        PrintWriter printer = new PrintWriter(new OutputStreamWriter(pipe.connect(), charset));
+        PrintWriter printer = new PrintWriter(new OutputStreamWriter(pipe.connect(Tests.Timeouts.brief()), charset));
         for (String line : lines) {
             printer.println(line);
             printer.flush();
@@ -60,7 +65,7 @@ public class SubprocessPipingTest extends SubprocessTestBase {
     }
 
     @SuppressWarnings("Duplicates")
-    @Test(timeout = 5000L)
+    @Test
     public void listen_pipeClass() throws Exception {
         org.apache.commons.io.input.TeeInputStream.class.getName();
         File wastelandFile = writePoemToFile();
@@ -81,7 +86,7 @@ public class SubprocessPipingTest extends SubprocessTestBase {
         Charset charset = Charset.defaultCharset();
         List<String> actualLines;
         // read from the process output stream while the process executes
-        try (Reader reader = new InputStreamReader(stdoutPipe.connect(), charset)) {
+        try (Reader reader = new InputStreamReader(stdoutPipe.connect(Tests.Timeouts.brief()), charset)) {
             /*
              * It's possible to get an IOException here when the process has not yet finished
              * (so PipedOutputStream.receivedLast has not been invoked) but the thread on which
@@ -97,7 +102,7 @@ public class SubprocessPipingTest extends SubprocessTestBase {
     }
 
     @SuppressWarnings("Duplicates")
-    @Test(timeout = 5000L)
+    @Test
     public void listen_pipe_interleaved() throws Exception {
         ByteBucket stderrBucket = ByteBucket.create();
         StreamPipeSink stdoutPipe = new StreamPipeSink();
@@ -116,8 +121,8 @@ public class SubprocessPipingTest extends SubprocessTestBase {
         Charset charset = Charset.defaultCharset();
         System.out.format("expecting poem: %n%s%n", String.join(System.lineSeparator(), poemLines));
         List<String> actualLines = new ArrayList<>(poemLines.size());
-        try (PrintWriter pipeWriter = new PrintWriter(new OutputStreamWriter(stdinPipe.connect(), charset));
-             BufferedReader pipeReader = new BufferedReader(new InputStreamReader(stdoutPipe.connect(), charset))) {
+        try (PrintWriter pipeWriter = new PrintWriter(new OutputStreamWriter(stdinPipe.connect(Tests.Timeouts.brief()), charset));
+             BufferedReader pipeReader = new BufferedReader(new InputStreamReader(stdoutPipe.connect(Tests.Timeouts.brief()), charset))) {
             for (String line : poemLines) {
                 pipeWriter.println(line);
                 pipeWriter.flush();
