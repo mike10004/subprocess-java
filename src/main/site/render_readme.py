@@ -1,16 +1,27 @@
 #!/usr/bin/env python3
 
+"""
+Program that produces the README file for the repository.
+
+This program reads a source file in the Jinja2 template syntax and
+interpolates variables defined with `--define` as well as code snippets
+demarcated by `README_SNIPPET theSnippetName` in source code files.
+
+This ensures that content such as version strings stays up to date in the
+readme file and that the code snippets provided there compile.
+"""
+
 from __future__ import print_function
-import sys
-import jinja2
 import re
 import glob
+import jinja2
 import logging
+from typing import List, TextIO
 from collections import defaultdict
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 
-_log = logging.getLogger('render_readme')
+_log = logging.getLogger(__name__)
 _RE_SNIPPET_BOOKEND = r'^\s*//\s*README_SNIPPET\s+(?P<id>\w+)\s*.*$'
 _STATE_INSIDE = 'in'
 _STATE_OUTSIDE = 'out'
@@ -18,13 +29,13 @@ _STATE_OUTSIDE = 'out'
 
 class Snippet(object):
 
-    def __init__(self, id, text):
-        self.id = id
-        assert id is not None
+    def __init__(self, id_, text):
+        self.id = id_
+        assert id_ is not None
         self.text = text or ''
 
     @classmethod
-    def load(cls, ifile):
+    def load(cls, ifile: TextIO) -> List['Snippet']:
         curr_id = None
         bucket = defaultdict(list)
         for line in ifile:
@@ -38,12 +49,12 @@ class Snippet(object):
                 if curr_id is not None:
                     bucket[curr_id].append(line)
         snippets = []
-        for id in bucket:
-            snippets.append(Snippet(id, ''.join(bucket[id])))
+        for id_ in bucket:
+            snippets.append(Snippet(id_, ''.join(bucket[id_])))
         return snippets
 
 
-def build_model(args):
+def build_model(args: Namespace):
     model = {}
     for definition in args.definitions:
         definition = definition[0]
