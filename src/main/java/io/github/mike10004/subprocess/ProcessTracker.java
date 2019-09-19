@@ -35,14 +35,6 @@ public interface ProcessTracker {
     int activeCount();
 
     /**
-     * Creates a process context instance. The default implementation is used.
-     * @return a new process context instance
-     */
-    static ProcessTracker create() {
-        return new ShutdownHookProcessTracker();
-    }
-
-    /**
      * Attempts to destroy multiple processes. For each process, {@link Process#destroy()} is invoked,
      * and then {@link Process#waitFor(long, TimeUnit) waitFor()} is invoked, blocking on the current
      * thread until the process terminates or the timeout elapses. If the process is still alive

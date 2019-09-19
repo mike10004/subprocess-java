@@ -1,64 +1,67 @@
 package io.github.mike10004.subprocess;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import static io.github.mike10004.subprocess.Preconditions.checkArgument;
 
 /**
  * Implementation of a process tracker that can be used in a try-with-resources
  * block. When execution exits the block, all the processes are destroyed
- * using {@link #destroyAll()}.
+ * using {@link #destroyAll()}. This is probably the best implementation of a
+ * process tracker to use for cases where you are waiting synchronously for
+ * processes to execute.
+ *
+ * <p>For the asynchronous use case, use {@link BasicProcessTracker}.
  */
-public class ScopedProcessTracker implements ProcessTracker, AutoCloseable {
+public class ScopedProcessTracker extends BasicProcessTracker implements AutoCloseable {
 
+    /**
+     * Default amount of time to wait for processes to terminate when {@link #close()} is invoked.
+     */
     public static final long DEFAULT_DESTROY_TIMEOUT_MILLIS = 500;
 
-    private final Set<Process> processes;
     private final long destroyTimeoutMillis;
 
+    /**
+     * Constructs an instance with the default timeout.
+     */
     public ScopedProcessTracker() {
         this(DEFAULT_DESTROY_TIMEOUT_MILLIS);
     }
 
-    ScopedProcessTracker(long destroyTimeoutMillis) {
-        // we can probably remove this synchro wrapper because all our methods are synchronized
-        this.processes = Collections.synchronizedSet(new HashSet<>());
+    /**
+     * Constructs an instance that will use the given timeout when attempting to destroy processes.
+     * @param destroyTimeoutMillis time to wait before throwing an exception on close
+     */
+    public ScopedProcessTracker(long destroyTimeoutMillis) {
         this.destroyTimeoutMillis = destroyTimeoutMillis;
+        checkArgument(destroyTimeoutMillis >= 0, "timeout must be nonnegative");
     }
 
-    @Override
-    public synchronized void add(Process process) {
-        processes.add(process);
-        Preconditions.checkState(processes.contains(process), "failed to add %s", process);
-    }
-
-    @Override
-    public synchronized boolean remove(Process process) {
-        return processes.remove(process);
-    }
-
-    @Override
-    public synchronized int activeCount() {
-        return processes.size();
-    }
-
+    /**
+     * Attempts to destroy all processes tracked by this instance that are still executing.
+     * @return the list unfinished processes
+     * @see ProcessTracker#destroyAll(Iterable, long, TimeUnit)
+     */
     public List<Process> destroyAll() {
-        return ProcessTracker.destroyAll(processes, destroyTimeoutMillis, TimeUnit.MILLISECONDS);
+        return super.destroyAll(destroyTimeoutMillis);
     }
 
+    /**
+     * Attempts to destroy all tracked processes that are still executing.
+     * @throws ProcessStillAliveException if processes are still alive after attempting
+     * to destroy them and waiting for the timeout to elapse
+     */
     @Override
     public synchronized void close() throws ProcessStillAliveException {
         List<Process> undestroyed = destroyAll();
         List<Process> stillAlive = undestroyed.stream().filter(Process::isAlive).collect(Collectors.toList());
-        processes.retainAll(stillAlive);
         int stillAliveCount = stillAlive.size();
         if (stillAliveCount > 0) {
-            throw new ProcessStillAliveException(stillAliveCount + " processes still alive");
+            throw new ProcessStillAliveException(stillAliveCount + " processes still alive after attempting to destroy them");
         }
     }
-
 
 }

@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
@@ -65,8 +66,12 @@ class ProcessMissionControl {
         };
     }
 
+    /**
+     * Returns a copy of the command line, including executable and arguments.
+     * @return the command line as a list
+     */
     private List<String> getCommandLine() {
-        return Stream.concat(Stream.of(program.executable()), program.arguments().stream()).collect(Defensive.toList());
+        return Stream.concat(Stream.of(program.executable()), program.arguments().stream()).collect(Collectors.toList());
     }
 
     private Process createProcess(List<String> cmdline) {

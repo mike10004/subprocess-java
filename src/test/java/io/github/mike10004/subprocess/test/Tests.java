@@ -2,7 +2,9 @@ package io.github.mike10004.subprocess.test;
 
 import com.google.common.base.CharMatcher;
 import io.github.mike10004.subprocess.ProcessResult;
+import io.github.mike10004.subprocess.ProcessTracker;
 import io.github.mike10004.subprocess.ScopedProcessTracker;
+import io.github.mike10004.subprocess.ShutdownHookProcessTracker;
 import io.github.mike10004.subprocess.Subprocess;
 import io.github.mike10004.subprocess.test.Poller.PollOutcome;
 import io.github.mike10004.subprocess.test.Poller.StopReason;

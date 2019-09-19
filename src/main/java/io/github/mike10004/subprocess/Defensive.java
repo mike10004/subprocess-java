@@ -13,13 +13,15 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.stream.Collectors.toList;
+
 class Defensive {
 
     private Defensive() {
 
     }
 
-    public static <T> List<T> copyOf(List<T> items) {
+    public static <T> List<T> immutable(List<T> items) {
         return Collections.unmodifiableList(new ArrayList<>(items));
     }
 
@@ -27,11 +29,11 @@ class Defensive {
         return StreamSupport.stream(items.spliterator(), false).collect(toList());
     }
 
-    public static <T> Set<T> copyOf(Set<T> items) {
+    public static <T> Set<T> immutable(Set<T> items) {
         return Collections.unmodifiableSet(new HashSet<>(items));
     }
 
-    public static <K, V> Map<K, V> copyOf(Map<K, V> items) {
+    public static <K, V> Map<K, V> immutable(Map<K, V> items) {
         return Collections.unmodifiableMap(new HashMap<>(items));
     }
 
@@ -43,7 +45,4 @@ class Defensive {
         Preconditions.checkArgument(StreamSupport.stream(items.spliterator(), false).allMatch(condition), message);
     }
 
-    public static <T> Collector<T, ?, List<T>> toList() {
-        return Collectors.toList();
-    }
 }

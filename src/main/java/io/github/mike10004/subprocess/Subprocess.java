@@ -93,24 +93,41 @@ public class Subprocess {
      * Immutable list of arguments. List does not include executable.
      */
     private final List<String> arguments;
+
     @Nullable
     private final File workingDirectory;
+
     /**
      * Immutable map of environment variables that are to supplement the inherited environment.
      */
     private final Map<String, String> environment;
+
     private final Supplier<? extends ExecutorService> launchExecutorServiceFactory;
 
     protected Subprocess(String executable, @Nullable File workingDirectory, Map<String, String> environment, List<String> arguments) {
         this.executable = requireNonNull(executable, "executable");
         this.workingDirectory = workingDirectory;
-        this.arguments = Defensive.copyOf(arguments);
-        this.environment = Defensive.copyOf(environment);
+        this.arguments = Defensive.immutable(arguments);
+        this.environment = Defensive.immutable(environment);
         launchExecutorServiceFactory = ExecutorServices.newSingleThreadExecutorServiceFactory("subprocess-launch");
     }
 
     /**
-     * Launches a subprocess. Use {@link #launcher(ProcessTracker)} to build a launcher
+     * Launches the subprocess defined by this instance and ignores all output.
+     * Use {@link #launcher(ProcessTracker)} to build a launcher
+     * and invoke {@link Launcher#launch()} for a more fluent way of executing this method.
+     * @param processTracker a process tracker
+     * @return a process monitor
+     * @throws ProcessException
+     */
+    public ProcessMonitor<Void, Void> launch(ProcessTracker processTracker) throws ProcessException {
+        StreamContext<?, Void, Void> sinkhole = StreamContexts.sinkhole();
+        return launch(processTracker, sinkhole);
+    }
+
+    /**
+     * Launches the subprocess defined by this instance in the given input/output stream context.
+     * Use {@link #launcher(ProcessTracker)} to build a launcher
      * and invoke {@link Launcher#launch()} for a more fluent way of executing this method.
      * @param processTracker process tracker to use
      * @param streamContext stream context
@@ -140,6 +157,9 @@ public class Subprocess {
         return monitor;
     }
 
+    /**
+     * Exception thrown if an error occurs during process execution.
+     */
     @SuppressWarnings("unused")
     public static class ProcessExecutionException extends ProcessException {
         public ProcessExecutionException(String message) {
@@ -293,7 +313,7 @@ public class Subprocess {
     }
 
     /**
-     * Helper class that retains references to some dependencies so that you can
+     * Abstract service class that retains references to some dependencies so that you can
      * use a builder-style pattern to launch a process. Instances of this class are immutable
      * and methods that have return type {@code Launcher} return new instances.
      * @param <SO> standard output capture type
@@ -393,7 +413,6 @@ public class Subprocess {
          * @return a new launcher instance
          * @see #outputInMemory(StreamInput)
          */
-        @SuppressWarnings("unused")
         public UniformLauncher<byte[]> outputInMemory() {
             return outputInMemory(null);
         }

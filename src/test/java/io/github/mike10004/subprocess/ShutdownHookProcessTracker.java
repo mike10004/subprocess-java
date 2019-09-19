@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * heavily used for so long.
  */
 @VisibleForTesting
-class ShutdownHookProcessTracker implements ProcessTracker {
+public class ShutdownHookProcessTracker implements ProcessTracker {
 
     private static final Logger log = LoggerFactory.getLogger(ShutdownHookProcessTracker.class);
 

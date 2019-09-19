@@ -1,6 +1,7 @@
 package io.github.mike10004.subprocess.test;
 
 import io.github.mike10004.subprocess.ProcessTracker;
+import io.github.mike10004.subprocess.ShutdownHookProcessTracker;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -34,7 +35,7 @@ public class ProcessTrackerRule extends ExternalResource {
 
     @Override
     protected void before() {
-        processTracker = ProcessTracker.create();
+        processTracker = new ShutdownHookProcessTracker();
     }
 
     @Override
