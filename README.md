@@ -51,13 +51,16 @@ to import the classes.
 
 ### Launch process and write output to file
 
-            ProcessMonitor<File, File> monitor = Subprocess.running("echo")
-                    .arg("0123456789")
-                    .build()
-                    .launcher(ProcessTracker.create())
-                    .outputTempFiles(new File(System.getProperty("java.io.tmpdir")).toPath())
-                    .launch();
-            ProcessResult<File, File> result = monitor.await();
+            ProcessResult<File, File> result;
+            try (ScopedProcessTracker processTracker = new ScopedProcessTracker()) {
+                ProcessMonitor<File, File> monitor = Subprocess.running("echo")
+                        .arg("0123456789")
+                        .build()
+                        .launcher(processTracker)
+                        .outputTempFiles(new File(System.getProperty("java.io.tmpdir")).toPath())
+                        .launch();
+                result = monitor.await();
+            }
             File stdoutFile = result.content().stdout();
             System.out.format("%d bytes written to %s%n", stdoutFile.length(), stdoutFile);
             stdoutFile.delete();
@@ -67,14 +70,17 @@ to import the classes.
 ### Feed standard input to process
 
             StreamInput input = StreamInput.fromFile(new File("/etc/passwd"));
-            ProcessMonitor<String, String> monitor = Subprocess.running("grep")
-                    .arg("root")
-                    .build()
-                    .launcher(ProcessTracker.create())
-                    .outputStrings(Charset.defaultCharset(), input)
-                    .launch();
-            ProcessResult<String, String> result = monitor.await();
-            System.out.println("printed " + result.content().stdout());
+            ProcessResult<String, String> result;
+            try (ScopedProcessTracker processTracker = new ScopedProcessTracker()) {
+                ProcessMonitor<String, String> monitor = Subprocess.running("grep")
+                        .arg("root")
+                        .build()
+                        .launcher(processTracker)
+                        .outputStrings(Charset.defaultCharset(), input)
+                        .launch();
+                result = monitor.await();
+            }
+            System.out.println("grepped " + result.content().stdout());  // prints 'root' line from /etc/passwd
 
 
 ### Terminate a process
