@@ -6,11 +6,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Class that represents a process monitor. A process monitor is returned by
+ * Interface of a process monitor. A process monitor is returned by
  * {@link Subprocess#launch(ProcessTracker, StreamContext)} or
  * {@link Subprocess.Launcher#launch()}. Process execution is inherently asynchronous, so
  * launching a monitor returns an object that allows you to decide how to
- * handle changes (or lack thereof) in the process's state. To attach a listener
+ * handle changes in the process's state. To attach a listener
  * to the process, grab the {@link #future() future} and
  * {@link com.google.common.util.concurrent.Futures#addCallback(ListenableFuture, FutureCallback, Executor) Futures.addCallback()}.
  *

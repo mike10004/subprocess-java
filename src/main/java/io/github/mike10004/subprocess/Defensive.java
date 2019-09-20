@@ -1,6 +1,7 @@
 package io.github.mike10004.subprocess;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,25 +16,34 @@ import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Static methods for checking and maintaining integrity of collections.
+ */
 class Defensive {
 
     private Defensive() {
-
     }
 
-    public static <T> List<T> immutable(List<T> items) {
-        return Collections.unmodifiableList(new ArrayList<>(items));
+    public static <T> List<T> immutableCopyOf(Iterable<T> items) {
+        if (items instanceof Collection) {
+            return Collections.unmodifiableList(new ArrayList<>((Collection<T>) items));
+        }
+        List<T> list = new ArrayList<>();
+        for (T item : items) {
+            list.add(item);
+        }
+        return Collections.unmodifiableList(list);
     }
 
     public static <T> List<T> listOf(Iterable<T> items) {
         return StreamSupport.stream(items.spliterator(), false).collect(toList());
     }
 
-    public static <T> Set<T> immutable(Set<T> items) {
+    public static <T> Set<T> immutableCopyOf(Set<T> items) {
         return Collections.unmodifiableSet(new HashSet<>(items));
     }
 
-    public static <K, V> Map<K, V> immutable(Map<K, V> items) {
+    public static <K, V> Map<K, V> immutableCopyOf(Map<K, V> items) {
         return Collections.unmodifiableMap(new HashMap<>(items));
     }
 

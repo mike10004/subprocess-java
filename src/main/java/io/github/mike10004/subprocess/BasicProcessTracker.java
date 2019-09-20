@@ -5,8 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
+/**
+ * Service class that implements basic process tracking. An instance of this
+ * class maintains a set of processes that have been launched
+ */
 public class BasicProcessTracker implements ProcessTracker {
 
     private final Set<Process> processes;
@@ -21,8 +24,10 @@ public class BasicProcessTracker implements ProcessTracker {
 
     @Override
     public synchronized void add(Process process) {
-        processes.add(process);
-        Preconditions.checkState(processes.contains(process), "failed to add %s", process);
+        boolean added = processes.add(process);
+        if (!added && !processes.contains(process)) {
+            throw new IllegalStateException("failed to add " + process);
+        }
     }
 
     @Override
@@ -37,12 +42,12 @@ public class BasicProcessTracker implements ProcessTracker {
 
     /**
      * Attempts to destroy all processes tracked by this instance that are still executing.
-     * @param destroyTimeoutMillis millseconds to wait for processes to terminate
+     * @param destroyTimeoutMillis millseconds to wait for each process to terminate
      * @return the list of processes still alive after the timeout elapses
      * @see ProcessTracker#destroyAll(Iterable, long, TimeUnit)
      */
-    public List<Process> destroyAll(long destroyTimeoutMillis) {
-        return ProcessTracker.destroyAll(processes, destroyTimeoutMillis, TimeUnit.MILLISECONDS);
+    public List<Process> destroyAll(long timeoutPerProcess, TimeUnit unit) {
+        return ProcessTracker.destroyAll(processes, timeoutPerProcess, unit);
     }
 
 }

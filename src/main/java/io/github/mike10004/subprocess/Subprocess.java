@@ -107,8 +107,8 @@ public class Subprocess {
     protected Subprocess(String executable, @Nullable File workingDirectory, Map<String, String> environment, List<String> arguments) {
         this.executable = requireNonNull(executable, "executable");
         this.workingDirectory = workingDirectory;
-        this.arguments = Defensive.immutable(arguments);
-        this.environment = Defensive.immutable(environment);
+        this.arguments = Defensive.immutableCopyOf(arguments);
+        this.environment = Defensive.immutableCopyOf(environment);
         launchExecutorServiceFactory = ExecutorServices.newSingleThreadExecutorServiceFactory("subprocess-launch");
     }
 

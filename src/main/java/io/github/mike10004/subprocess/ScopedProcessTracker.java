@@ -22,7 +22,7 @@ public class ScopedProcessTracker extends BasicProcessTracker implements AutoClo
      */
     public static final long DEFAULT_DESTROY_TIMEOUT_MILLIS = 500;
 
-    private final long destroyTimeoutMillis;
+    private final long destroyTimeoutPerProcessMs;
 
     /**
      * Constructs an instance with the default timeout.
@@ -33,11 +33,11 @@ public class ScopedProcessTracker extends BasicProcessTracker implements AutoClo
 
     /**
      * Constructs an instance that will use the given timeout when attempting to destroy processes.
-     * @param destroyTimeoutMillis time to wait before throwing an exception on close
+     * @param destroyTimeoutPerProcessMs time to wait before throwing an exception on close
      */
-    public ScopedProcessTracker(long destroyTimeoutMillis) {
-        this.destroyTimeoutMillis = destroyTimeoutMillis;
-        checkArgument(destroyTimeoutMillis >= 0, "timeout must be nonnegative");
+    public ScopedProcessTracker(long destroyTimeoutPerProcessMs) {
+        this.destroyTimeoutPerProcessMs = destroyTimeoutPerProcessMs;
+        checkArgument(destroyTimeoutPerProcessMs >= 0, "timeout must be nonnegative");
     }
 
     /**
@@ -46,7 +46,7 @@ public class ScopedProcessTracker extends BasicProcessTracker implements AutoClo
      * @see ProcessTracker#destroyAll(Iterable, long, TimeUnit)
      */
     public List<Process> destroyAll() {
-        return super.destroyAll(destroyTimeoutMillis);
+        return super.destroyAll(destroyTimeoutPerProcessMs, TimeUnit.MILLISECONDS);
     }
 
     /**
