@@ -6,9 +6,9 @@ install:
 - cmd: >-
     dir %PYTHON%
 
-    "%PYTHON%\\pip" --version
+    %PYTHON%\python.exe -m pip help
 
-    "%PYTHON%\\pip" install jinja2
+    %PYTHON%\python.exe -m pip install jinja2
 build_script:
 - cmd: >-
     python --version
