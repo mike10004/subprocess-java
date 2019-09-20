@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public abstract class SubprocessTestBase {
 
-    protected static final ProcessTracker TRACKER = Tests.create();
+    protected static final ProcessTracker TRACKER = new ShutdownHookProcessTracker();
 
     private volatile boolean testFailed;
     private volatile Description description;
