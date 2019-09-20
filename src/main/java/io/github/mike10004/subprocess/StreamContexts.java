@@ -1,7 +1,5 @@
 package io.github.mike10004.subprocess;
 
-import io.github.mike10004.subprocess.StreamContext.UniformStreamContext;
-
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileOutputStream;

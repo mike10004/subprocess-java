@@ -20,8 +20,8 @@ public final class UniformSubprocessLaunchSupport<S> extends SubprocessLaunchSup
      * @return a new launcher instance
      */
     public <T> UniformSubprocessLaunchSupport<T> map(Function<? super S, T> mapper) {
-        StreamContext.UniformStreamContext<?, S> u = StreamContext.UniformStreamContext.wrap(this.streamContext);
-        StreamContext.UniformStreamContext<?, T> t = u.map(mapper);
+        UniformStreamContext<?, S> u = UniformStreamContext.wrap(this.streamContext);
+        UniformStreamContext<?, T> t = u.map(mapper);
         return uniformOutput(t);
     }
 

@@ -37,7 +37,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * @param <S> type of captured standard output and standard error
      * @return a new launcher instance
      */
-    public <S> UniformSubprocessLaunchSupport<S> output(StreamContext.UniformStreamContext<?, S> streamContext) {
+    public <S> UniformSubprocessLaunchSupport<S> output(UniformStreamContext<?, S> streamContext) {
         return uniformOutput(streamContext);
     }
 
@@ -115,7 +115,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * @return a new launcher instance
      */
     public UniformSubprocessLaunchSupport<byte[]> outputInMemory(@Nullable StreamInput stdin) {
-        StreamContext.UniformStreamContext<?, byte[]> m = StreamContexts.byteArrays(stdin);
+        UniformStreamContext<?, byte[]> m = StreamContexts.byteArrays(stdin);
         return output(m);
     }
 
