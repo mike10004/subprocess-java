@@ -216,6 +216,8 @@
                                 <argument>project_artifactId=${project.artifactId}</argument>
                                 <argument>--define</argument>
                                 <argument>project_version=${project.version}</argument>
+                                <argument>--snippet-chop</argument>
+                                <argument>8</argument>
                                 <argument>--output</argument>
                                 <argument>${project.basedir}/README.md</argument>
                                 <argument>${project.basedir}/src/main/site/readme.src.md</argument>
@@ -261,9 +263,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -274,11 +282,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>3.0.1</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

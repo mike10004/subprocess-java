@@ -10,12 +10,9 @@ outside the JVM.
 
 * use asynchronous patterns for process launch and termination
 * support customization but provide sensible defaults 
-* clean separation of value classes and service classes/interfaces
-* avoid Guava, now that Java 8 has nice replacements
+* cleanly separate of value classes and service classes/interfaces
+* avoid dependencies to allow library users to do their own thing
 * support Windows and Linux (and MacOS for the most part, but without testing)
-
-(Don't get me wrong, I think Guava is an excellent library, but whenever I 
-depend on it, it ends up dominating the API.)
 
 ## Quick Start
 
@@ -31,7 +28,9 @@ and use
 
     import io.github.mike10004.subprocess.*;
 
-to import the classes.
+to import the classes. (Note that the `groupId` is `com.github.mike10004` but 
+the package starts with `io.github.mike10004`. I recognize that this is an 
+unfortunate inconsistency.)
 
 ### Launch process and capture output
 
@@ -48,6 +47,10 @@ ${readme_example_feedStandardInput}
 ### Terminate a process
 
 ${readme_example_terminate}
+
+### Launch process and tail output
+
+${readme_example_tailOutput}
 
 ## Motivations
 

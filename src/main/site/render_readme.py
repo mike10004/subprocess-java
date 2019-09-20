@@ -35,7 +35,7 @@ class Snippet(object):
         self.text = text or ''
 
     @classmethod
-    def load(cls, ifile: TextIO) -> List['Snippet']:
+    def load(cls, ifile: TextIO, chop: int = 0) -> List['Snippet']:
         curr_id = None
         bucket = defaultdict(list)
         for line in ifile:
@@ -50,7 +50,8 @@ class Snippet(object):
                     bucket[curr_id].append(line)
         snippets = []
         for id_ in bucket:
-            snippets.append(Snippet(id_, ''.join(bucket[id_])))
+            lines = [line[chop:] for line in bucket[id_]]
+            snippets.append(Snippet(id_, ''.join(lines)))
         return snippets
 
 
@@ -64,7 +65,7 @@ def build_model(args: Namespace):
         snippets = []
         for pathname in glob.glob(args.snippet_sources):
             with open(pathname, 'r') as ifile:
-                snippets += Snippet.load(ifile)
+                snippets += Snippet.load(ifile, args.snippet_chop)
         for snippet in snippets:
             model[snippet.id] = snippet.text
     return model
@@ -76,6 +77,7 @@ def main():
     p.add_argument("-o", "--output", default="/dev/stdout", help="output file")
     p.add_argument("--define", dest="definitions", nargs=1, action='append', help="define a model property")
     p.add_argument("--snippet-sources", metavar="PATTERN", help="define snippet sources with a wildcard pattern")
+    p.add_argument("--snippet-chop", type=int, default=0, help="number of chars to chop from front of each snippet line")
     p.add_argument("--log-level", choices=('DEBUG', 'WARN', 'INFO', 'ERROR'), default='INFO', help="set log level")
     args = p.parse_args()
     logging.basicConfig(level=logging.__dict__[args.log_level])
