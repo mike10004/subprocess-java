@@ -21,4 +21,4 @@ build_script:
 
     mvn --version
 
-    mvn install --batch-mode %MAVEN_OPTS%
+    mvn install --batch-mode %MORE_MAVEN_OPTS%
