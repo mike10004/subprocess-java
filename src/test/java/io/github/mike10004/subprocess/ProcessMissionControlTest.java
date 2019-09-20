@@ -1,8 +1,11 @@
 package io.github.mike10004.subprocess;
 
 import io.github.mike10004.subprocess.test.Tests;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import java.io.File;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -74,4 +77,26 @@ public class ProcessMissionControlTest {
     private ExecutorService createExecutorService() {
         return ExecutorServices.newSingleThreadExecutorServiceFactory("ProcessMissionControlTest").get();
     }
+
+    @Test(expected = ProcessMissionControl.ProcessStartException.class)
+    public void startExceptionThrownIfExecutableNotFound() throws Exception {
+        String executableName = UUID.randomUUID().toString();
+        try (ScopedProcessTracker tracker = new ScopedProcessTracker()){
+            Subprocess p = Subprocess.running(executableName).build();
+            p.launch(tracker);
+        }
+    }
+
+    @Test(expected = ProcessMissionControl.InvalidWorkingDirectoryException.class)
+    public void workingDirectoryExceptionThrownIfDoesNotExist() throws Exception {
+        File workingDir = new File(FileUtils.getUserDirectory(), UUID.randomUUID().toString());
+        String executableName = UUID.randomUUID().toString();
+        try (ScopedProcessTracker tracker = new ScopedProcessTracker()){
+            Subprocess p = Subprocess.running(executableName)
+                    .from(workingDir)
+                    .build();
+            p.launch(tracker);
+        }
+    }
+
 }

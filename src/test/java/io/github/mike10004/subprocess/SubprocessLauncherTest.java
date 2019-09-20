@@ -26,7 +26,6 @@ public class SubprocessLauncherTest {
         ProcessResult<Integer, Boolean> result = launcher.launch().await();
         assertEquals(5, result.content().stdout().intValue());
         assertTrue(result.content().stderr());
-
     }
 
     private static class CannedMonitor<SO, SE> implements ProcessMonitor<SO,SE> {

@@ -23,11 +23,11 @@ import java.util.stream.StreamSupport;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Class that represents a subprocess to be executed. Instances of this class
+ * Value class that represents a subprocess to be executed. Instances of this class
  * are immutable and may be reused. This API adheres to an asynchronous model,
  * so after you launch a process, you receive a {@link ProcessMonitor monitor}
- * instance that allows you to wait for the result on the current thread or
- * attach a listener notified when the process terminates.
+ * instance that provides methods to block on the current thread or obtain
+ * a {@link Future} result.
  *
  * <p>To launch a process and ignore the output:</p>
  * <pre>
@@ -84,7 +84,7 @@ import static java.util.Objects.requireNonNull;
  * }
  * </pre>
  *
- * @since 7.1.0
+ * @since 0.1
  */
 public class Subprocess {
     
@@ -475,7 +475,7 @@ public class Subprocess {
     }
 
     /**
-     * Class that represents a launcher using a uniform output control.
+     * Service class that represents a launcher using a uniform output control.
      * @param <S> type of captured standard output and standard error content
      */
     public abstract class UniformLauncher<S> extends Launcher<S, S> {
