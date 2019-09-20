@@ -83,7 +83,7 @@ public class ProcessMissionControlTest {
         String executableName = UUID.randomUUID().toString();
         try (ScopedProcessTracker tracker = new ScopedProcessTracker()){
             Subprocess p = Subprocess.running(executableName).build();
-            p.launch(tracker);
+            new BasicSubprocessLauncher(tracker).launch(p);
         }
     }
 
@@ -95,7 +95,7 @@ public class ProcessMissionControlTest {
             Subprocess p = Subprocess.running(executableName)
                     .from(workingDir)
                     .build();
-            p.launch(tracker);
+            new BasicSubprocessLauncher(tracker).launch(p);
         }
     }
 

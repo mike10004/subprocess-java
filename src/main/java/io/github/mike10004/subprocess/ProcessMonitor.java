@@ -8,7 +8,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Interface of a process monitor. A process monitor is returned by
  * {@link Subprocess#launch(ProcessTracker, StreamContext)} or
- * {@link Subprocess.Launcher#launch()}. Process execution is inherently asynchronous, so
+ * {@link SubprocessLauncher#launch()}. Process execution is inherently asynchronous, so
  * launching a monitor returns an object that allows you to decide how to
  * handle changes in the process's state. To attach a listener
  * to the process, grab the {@link #future() future} and

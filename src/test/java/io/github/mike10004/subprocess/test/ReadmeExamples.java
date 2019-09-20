@@ -1,5 +1,6 @@
 package io.github.mike10004.subprocess.test;
 
+import io.github.mike10004.subprocess.BasicSubprocessLauncher;
 import io.github.mike10004.subprocess.DestroyAttempt;
 import io.github.mike10004.subprocess.ProcessMonitor;
 import io.github.mike10004.subprocess.ProcessResult;
@@ -9,6 +10,7 @@ import io.github.mike10004.subprocess.StreamContext;
 import io.github.mike10004.subprocess.StreamControl;
 import io.github.mike10004.subprocess.StreamInput;
 import io.github.mike10004.subprocess.Subprocess;
+import io.github.mike10004.subprocess.SubprocessLauncher;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -39,15 +41,33 @@ public class ReadmeExamples {
     public static class Example_LaunchProcessAndIgnoreOutput {
 
         public static void main(String[] args) throws Exception {
-            System.out.println("launchAndIgnoreOutput");
+            System.out.println("readme_example_nonFluentInterface");
             // README_SNIPPET readme_example_nonFluentInterface
             Subprocess subprocess = Subprocess.running("true").build();
             try (ScopedProcessTracker processTracker = new ScopedProcessTracker()) {
-                ProcessMonitor<?, ?> monitor = subprocess.launch(processTracker);
+                SubprocessLauncher launcher = new BasicSubprocessLauncher(processTracker);
+                ProcessMonitor<?, ?> monitor = launcher.launch(subprocess);
                 ProcessResult<?, ?> result = monitor.await();
                 System.out.println("exit with status " + result.exitCode());
             }
             // README_SNIPPET readme_example_nonFluentInterface
+        }
+    }
+
+    public static class Example_FluentlyLaunchProcessAndIgnoreOutput {
+
+        public static void main(String[] args) throws Exception {
+            System.out.println("readme_example_fluentInterface");
+            // README_SNIPPET readme_example_fluentInterface
+            try (ScopedProcessTracker processTracker = new ScopedProcessTracker()) {
+                int exitCode = Subprocess.running("true").build()
+                        .launcher(processTracker)
+                        .launch()
+                        .await()
+                        .exitCode();
+                System.out.println("exit with status " + exitCode);
+            }
+            // README_SNIPPET readme_example_fluentInterface
         }
     }
 

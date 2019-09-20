@@ -10,20 +10,21 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SubprocessLauncherTest {
+public class SubprocessLaunchSupportTest {
 
     @Test
     public void map() throws Exception {
         Subprocess p = Subprocess.running("echo").arg("hello, world").build();
         StreamControl ctrl = new StreamContexts.BucketContext(null);
         StreamContext<?, String, String> ctx = StreamContexts.predefined(ctrl, () -> "5", () -> "true");
-        Subprocess.Launcher<Integer, Boolean> launcher = p.new Launcher<String, String>(EasyMock.createMock(ProcessTracker.class), ctx) {
+        SubprocessLauncher launcher = new BasicSubprocessLauncher(EasyMock.createMock(ProcessTracker.class));
+        SubprocessLaunchSupport<Integer, Boolean> launchSupport = new SubprocessLaunchSupport<String, String>(p, launcher, ctx) {
             @Override
             public ProcessMonitor<String, String> launch() throws SubprocessException {
                 return new CannedMonitor<>(ProcessResult.direct(0, "5", "true"));
             }
         }.map(Integer::valueOf, Boolean::parseBoolean);
-        ProcessResult<Integer, Boolean> result = launcher.launch().await();
+        ProcessResult<Integer, Boolean> result = launchSupport.launch().await();
         assertEquals(5, result.content().stdout().intValue());
         assertTrue(result.content().stderr());
     }
