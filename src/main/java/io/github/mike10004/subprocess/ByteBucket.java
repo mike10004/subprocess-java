@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import static java.util.Objects.requireNonNull;
+
 class ByteBucket implements StreamOutput {
 
     private final ByteArrayOutputStream collector;
 
     public ByteBucket(ByteArrayOutputStream collector) {
-        this.collector = collector;
+        this.collector = requireNonNull(collector, "collector");
     }
 
     @SuppressWarnings("RedundantThrows")

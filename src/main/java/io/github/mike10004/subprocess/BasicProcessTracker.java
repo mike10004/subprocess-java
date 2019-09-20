@@ -42,7 +42,8 @@ public class BasicProcessTracker implements ProcessTracker {
 
     /**
      * Attempts to destroy all processes tracked by this instance that are still executing.
-     * @param destroyTimeoutMillis millseconds to wait for each process to terminate
+     * @param timeoutPerProcess timeout to wait for each process to terminate
+     * @param unit timeout unit
      * @return the list of processes still alive after the timeout elapses
      * @see ProcessTracker#destroyAll(Iterable, long, TimeUnit)
      */

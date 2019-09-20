@@ -49,9 +49,9 @@ public class SubprocessKillTest extends SubprocessTestBase {
         System.out.println("waiting for pid to be printed...");
         String pid = Tests.readWhenNonempty(pidFile);
         System.out.format("pid printed: %s%n", pid);
-        DestroyAttempt.TermAttempt termAttempt = monitor.destructor().sendTermSignal();
+        SigtermAttempt termAttempt = monitor.destructor().sendTermSignal();
         assertEquals("should still be alive after SIGTERM", DestroyResult.STILL_ALIVE, termAttempt.result());
-        DestroyAttempt.KillAttempt attempt = termAttempt.kill();
+        SigkillAttempt attempt = termAttempt.kill();
         attempt.awaitKill();
         int exitCode = monitor.await().exitCode();
         if (Tests.isPlatformLinux()) {
@@ -69,7 +69,7 @@ public class SubprocessKillTest extends SubprocessTestBase {
         System.out.println("waiting for pid to be printed...");
         String pid = Tests.readWhenNonempty(pidFile, 1, US_ASCII);
         System.out.format("pid printed: %s%n", pid);
-        DestroyAttempt.TermAttempt termAttempt = monitor.destructor().sendTermSignal().await();
+        SigtermAttempt termAttempt = monitor.destructor().sendTermSignal().await();
         assertEquals("term attempt result", DestroyResult.TERMINATED, termAttempt.result());
         int exitCode = monitor.await().exitCode();
         if (Tests.isPlatformLinux()) {

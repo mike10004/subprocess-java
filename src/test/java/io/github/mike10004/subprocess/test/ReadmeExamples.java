@@ -1,10 +1,10 @@
 package io.github.mike10004.subprocess.test;
 
 import io.github.mike10004.subprocess.BasicSubprocessLauncher;
-import io.github.mike10004.subprocess.DestroyAttempt;
 import io.github.mike10004.subprocess.ProcessMonitor;
 import io.github.mike10004.subprocess.ProcessResult;
 import io.github.mike10004.subprocess.ScopedProcessTracker;
+import io.github.mike10004.subprocess.SigtermAttempt;
 import io.github.mike10004.subprocess.StreamContent;
 import io.github.mike10004.subprocess.StreamContext;
 import io.github.mike10004.subprocess.StreamControl;
@@ -151,11 +151,11 @@ public class ReadmeExamples {
                         .outputStrings(Charset.defaultCharset())
                         .launch();
                 System.out.println("process alive? " + monitor.process().isAlive());
-                DestroyAttempt.TermAttempt attempt = monitor.destructor().sendTermSignal()
-                        .timeout(3, TimeUnit.SECONDS);
+                SigtermAttempt attempt = monitor.destructor().sendTermSignal()
+                        .await(3, TimeUnit.SECONDS);
                 System.out.println("process alive? " + monitor.process().isAlive());
                 if (monitor.process().isAlive()) {
-                    attempt.kill().timeoutOrThrow(3, TimeUnit.SECONDS);
+                    attempt.kill().awaitOrThrow(3, TimeUnit.SECONDS);
                 }
             }
             // README_SNIPPET readme_example_terminate

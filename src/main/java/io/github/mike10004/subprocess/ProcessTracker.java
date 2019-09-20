@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Interface that represents a process context. A process context tracks the creation
- * and destruction of processes.
+ * Interface of a service that tracks processes. Implementations of this interface
+ * track the creation and destruction of processes.
  */
 public interface ProcessTracker {
 

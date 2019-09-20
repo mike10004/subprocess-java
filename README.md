@@ -92,11 +92,11 @@ unfortunate inconsistency.)
                 .outputStrings(Charset.defaultCharset())
                 .launch();
         System.out.println("process alive? " + monitor.process().isAlive());
-        DestroyAttempt.TermAttempt attempt = monitor.destructor().sendTermSignal()
-                .timeout(3, TimeUnit.SECONDS);
+        SigtermAttempt attempt = monitor.destructor().sendTermSignal()
+                .await(3, TimeUnit.SECONDS);
         System.out.println("process alive? " + monitor.process().isAlive());
         if (monitor.process().isAlive()) {
-            attempt.kill().timeoutOrThrow(3, TimeUnit.SECONDS);
+            attempt.kill().awaitOrThrow(3, TimeUnit.SECONDS);
         }
     }
 

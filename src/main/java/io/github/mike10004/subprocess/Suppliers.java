@@ -18,6 +18,9 @@ import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.function.Supplier;
 
+/**
+ * @author Guava authors
+ */
 class Suppliers {
 
     private Suppliers() {}

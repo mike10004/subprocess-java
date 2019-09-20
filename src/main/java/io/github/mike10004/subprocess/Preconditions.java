@@ -104,7 +104,7 @@ import javax.annotation.Nullable;
  * @since 2.0
  */
 @SuppressWarnings("unused")
-public final class Preconditions {
+final class Preconditions {
     private Preconditions() {}
 
     /**

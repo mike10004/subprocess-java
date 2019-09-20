@@ -1,7 +1,5 @@
 package io.github.mike10004.subprocess;
 
-import io.github.mike10004.subprocess.DestroyAttempt.KillAttempt;
-import io.github.mike10004.subprocess.DestroyAttempt.TermAttempt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +30,7 @@ class BasicProcessDestructor implements ProcessDestructor {
     }
 
     @Override
-    public TermAttempt sendTermSignal() {
+    public SigtermAttempt sendTermSignal() {
         if (isAlreadyTerminated()) {
             return DestroyAttempts.terminated();
         }
@@ -49,7 +47,7 @@ class BasicProcessDestructor implements ProcessDestructor {
         }
     }
 
-    private TermAttempt createTermAttempt() {
+    private SigtermAttempt createTermAttempt() {
         DestroyResult result = trackCurrentResult();
         if (result == DestroyResult.TERMINATED) {
             return DestroyAttempts.terminated();
@@ -57,7 +55,7 @@ class BasicProcessDestructor implements ProcessDestructor {
         return new DestroyAttempts.TermAttemptImpl(this, process, result);
     }
 
-    private KillAttempt createKillAttempt() {
+    private SigkillAttempt createKillAttempt() {
         DestroyResult result = trackCurrentResult();
         if (result == DestroyResult.TERMINATED) {
             return DestroyAttempts.terminated();
@@ -66,7 +64,7 @@ class BasicProcessDestructor implements ProcessDestructor {
     }
 
     @Override
-    public KillAttempt sendKillSignal() {
+    public SigkillAttempt sendKillSignal() {
         if (isAlreadyTerminated()) {
             return DestroyAttempts.terminated();
         }

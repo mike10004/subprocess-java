@@ -7,6 +7,9 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Service class that implements basic subprocess launching.
+ */
 public class BasicSubprocessLauncher implements SubprocessLauncher {
 
     private final ProcessTracker processTracker;

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import static io.github.mike10004.subprocess.Preconditions.checkArgument;
 
 /**
- * Implementation of a process tracker that can be used in a try-with-resources
+ * Process tracker that can be used in a try-with-resources
  * block. When execution exits the block, all the processes are destroyed
  * using {@link #destroyAll()}. This is probably the best implementation of a
  * process tracker to use for cases where you are waiting synchronously for

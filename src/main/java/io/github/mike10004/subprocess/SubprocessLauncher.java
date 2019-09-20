@@ -2,13 +2,14 @@ package io.github.mike10004.subprocess;
 
 /**
  * Interface of a service that launches subprocesses.
+ * Instead of using implementations of this interface directly, you can invoke
+ * {@link Subprocess#launcher(SubprocessLauncher) Subprocess.launcher()} to
+ * create a {@link SubprocessLaunchSupport} instance.
  */
 public interface SubprocessLauncher {
 
     /**
-     * Launches the subprocess defined by this instance and ignores all output.
-     * Use {@link #launcher(ProcessTracker)} to build a launcher
-     * and invoke {@link SubprocessLauncher#launch()} for a more fluent way of executing this method.
+     * Launches the given ignores all output.
      * @return a process monitor
      * @throws SubprocessException
      */
@@ -18,9 +19,7 @@ public interface SubprocessLauncher {
     }
 
     /**
-     * Launches the subprocess defined by this instance in the given input/output stream context.
-     * Use {@link #launcher(ProcessTracker)} to build a launcher
-     * and invoke {@link SubprocessLauncher#launch()} for a more fluent way of executing this method.
+     * Launches a subprocess in the given input/output stream context.
      * @param streamContext stream context
      * @param <C> stream control type
      * @param <SO> type of captured standard output content

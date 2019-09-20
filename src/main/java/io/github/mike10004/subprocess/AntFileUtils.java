@@ -1,5 +1,8 @@
 package io.github.mike10004.subprocess;
 
+/**
+ * @author Apache Ant authors https://ant.apache.org/
+ */
 class AntFileUtils {
 
     private AntFileUtils() {}

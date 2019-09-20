@@ -12,19 +12,20 @@ class DestroyAttempts {
     @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(DestroyAttempts.class);
 
-    private static final class AlreadyTerminated implements DestroyAttempt.KillAttempt, DestroyAttempt.TermAttempt {
+    private static final class AlreadyTerminated implements SigkillAttempt, SigtermAttempt {
+
         @Override
         public DestroyResult result() {
             return DestroyResult.TERMINATED;
         }
 
         @Override
-        public TermAttempt await() {
+        public SigtermAttempt await() {
             return this;
         }
 
         @Override
-        public TermAttempt timeout(long duration, TimeUnit unit) {
+        public SigtermAttempt await(long duration, TimeUnit unit) {
             return this;
         }
 
@@ -33,17 +34,22 @@ class DestroyAttempts {
         }
 
         @Override
-        public boolean timeoutKill(long duration, TimeUnit timeUnit) {
-            return true;
-        }
-
-        @Override
-        public void timeoutOrThrow(long duration, TimeUnit timeUnit) {
-        }
-
-        @Override
-        public KillAttempt kill() {
+        public SigkillAttempt tryAwaitKill(long duration, TimeUnit timeUnit) {
             return this;
+        }
+
+        @Override
+        public void awaitOrThrow(long duration, TimeUnit timeUnit) {
+        }
+
+        @Override
+        public SigkillAttempt kill() {
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            return "DestroyAttempt{TERMINATED}";
         }
     }
 
@@ -55,7 +61,7 @@ class DestroyAttempts {
      * @return an attempt instance
      */
     @SuppressWarnings("unchecked")
-    public static <A extends DestroyAttempt.KillAttempt & DestroyAttempt.TermAttempt> A terminated() {
+    public static <A extends SigkillAttempt & SigtermAttempt> A terminated() {
         return (A) ALREADY_TERMINATED;
     }
 
@@ -63,9 +69,33 @@ class DestroyAttempts {
 
     private DestroyAttempts() {}
 
-    static class TermAttemptImpl extends AbstractDestroyAttempt implements DestroyAttempt.TermAttempt {
+    static abstract class AbstractDestroyAttempt implements DestroyAttempt {
 
-        @SuppressWarnings("unused")
+        protected final DestroyResult result;
+        protected final Process process;
+
+        public AbstractDestroyAttempt(DestroyResult result, Process process) {
+            this.result = requireNonNull(result);
+            this.process = requireNonNull(process);
+        }
+
+        /**
+         * Gets the result of the attempt.
+         * @return the result
+         */
+        @Override
+        public DestroyResult result() {
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s{%s}", getClass().getSimpleName(), result);
+        }
+    }
+
+    final static class TermAttemptImpl extends AbstractDestroyAttempt implements SigtermAttempt {
+
         private static final Logger log = LoggerFactory.getLogger(TermAttemptImpl.class);
 
         private final BasicProcessDestructor destructor;
@@ -76,7 +106,7 @@ class DestroyAttempts {
         }
 
         @Override
-        public TermAttempt await() {
+        public SigtermAttempt await() {
             if (result == DestroyResult.TERMINATED) {
                 return this;
             }
@@ -90,7 +120,7 @@ class DestroyAttempts {
         }
 
         @Override
-        public TermAttempt timeout(long duration, TimeUnit unit) {
+        public SigtermAttempt await(long duration, TimeUnit unit) {
             if (result == DestroyResult.TERMINATED) {
                 return this;
             }
@@ -106,7 +136,7 @@ class DestroyAttempts {
         }
 
         @Override
-        public KillAttempt kill() {
+        public SigkillAttempt kill() {
             if (result == DestroyResult.TERMINATED) {
                 return terminated();
             }
@@ -115,9 +145,8 @@ class DestroyAttempts {
 
     }
 
-    static class KillAttemptImpl extends AbstractDestroyAttempt implements DestroyAttempt.KillAttempt {
+    final static class KillAttemptImpl extends AbstractDestroyAttempt implements SigkillAttempt {
 
-        @SuppressWarnings("unused")
         private static final Logger log = LoggerFactory.getLogger(KillAttemptImpl.class);
 
         public KillAttemptImpl(DestroyResult result, Process process) {
@@ -125,8 +154,8 @@ class DestroyAttempts {
         }
 
         @Override
-        public void timeoutOrThrow(long duration, TimeUnit timeUnit) throws ProcessStillAliveException {
-            boolean succeeded = timeoutKill(duration, timeUnit);
+        public void awaitOrThrow(long duration, TimeUnit timeUnit) throws ProcessStillAliveException {
+            boolean succeeded = tryAwaitKill(duration, timeUnit).result() == DestroyResult.TERMINATED;
             if (!succeeded) {
                 throw new ProcessStillAliveException("kill failed");
             }
@@ -138,13 +167,14 @@ class DestroyAttempts {
         }
 
         @Override
-        public boolean timeoutKill(long duration, TimeUnit unit) {
+        public SigkillAttempt tryAwaitKill(long duration, TimeUnit unit) {
+            boolean terminated = false;
             try {
-                return process.waitFor(duration, unit);
+                terminated = process.waitFor(duration, unit);
             } catch (InterruptedException e) {
                 log.info("interrupted: " + e);
-                return false;
             }
+            return terminated ? ALREADY_TERMINATED : this;
         }
     }
 
