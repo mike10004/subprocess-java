@@ -35,18 +35,6 @@
                 <python.executable>python3</python.executable>
             </properties>
         </profile>
-        <profile>
-            <id>appveyor</id>
-            <activation>
-                <property>
-                    <name>build.environment</name>
-                    <value>appveyor</value>
-                </property>
-            </activation>
-            <properties>
-                <python.executable>${env.PYTHON}/python.exe</python.executable>
-            </properties>
-        </profile>
     </profiles>
     <inceptionYear>2018</inceptionYear>
     <licenses>
