@@ -12,7 +12,7 @@ import static java.util.Objects.requireNonNull;
  * @param <SO> standard output type
  * @param <SE> standard error type
  */
-public class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
+class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
 
     private final Process process;
     private final Future<ProcessResult<SO, SE>> future;

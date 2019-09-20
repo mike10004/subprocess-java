@@ -6,10 +6,11 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Interface of a process monitor. A process monitor is returned by
- * {@link SubprocessLauncher#launch(Subprocess)} or {@link SubprocessLaunchSupport#launch()}.
+ * {@link SubprocessLauncher#launch(Subprocess)} or
+ * {@link SubprocessLaunchSupport#launch()}.
  *
- * Processes are launched asynchronously, and launch methods return
- * a monitor instance.
+ * Processes are launched asynchronously, and launch methods return a monitor
+ * instance.
  *
  * @param <SO> type of captured standard output contents
  * @param <SE> type of captured standard error contents
