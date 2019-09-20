@@ -4,8 +4,8 @@ environment:
   PYTHON: "C:\\Python36-x64"
 install:
 - dir %PYTHON%
-- %PYTHON%\pip --version
-- %PYTHON%\pip install jinja2
+- "%PYTHON%\pip" --version
+- "%PYTHON%\pip" install jinja2
 build_script:
 - cmd: >-
     python --version
