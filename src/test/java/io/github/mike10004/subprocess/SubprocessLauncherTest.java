@@ -58,7 +58,7 @@ public class SubprocessLauncherTest {
         }
 
         @Override
-        public ProcessResult<SO, SE> await(long timeout, TimeUnit unit) throws ProcessExecutionInnerException {
+        public ProcessResult<SO, SE> await(long timeout, TimeUnit unit) {
             return result;
         }
 

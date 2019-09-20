@@ -106,7 +106,7 @@ class ProcessMissionControl {
     @VisibleForTesting
     Process execute() {
         File workingDirectory = program.workingDirectory();
-        if (!InvalidWorkingDirectoryException.check(workingDirectory)) {
+        if (!checkWorkingDirectory(workingDirectory)) {
             throw new InvalidWorkingDirectoryException(workingDirectory);
         }
         final Process process = createProcess(getCommandLine());
@@ -114,14 +114,16 @@ class ProcessMissionControl {
         return process;
     }
 
+    private static boolean checkWorkingDirectory(@Nullable File workingDirectory) {
+        return workingDirectory == null || workingDirectory.isDirectory();
+    }
+
     static class InvalidWorkingDirectoryException extends SubprocessLaunchException {
+
         public InvalidWorkingDirectoryException(File workingDirectory) {
             super("specified working directory " + workingDirectory + " is not a directory; is file? " + workingDirectory.isFile());
         }
 
-        static boolean check(@Nullable File workingDirectory) {
-            return workingDirectory == null || workingDirectory.isDirectory();
-        }
     }
 
     private static class MaybeNullResource<T extends java.io.Closeable> implements java.io.Closeable {
@@ -200,8 +202,7 @@ class ProcessMissionControl {
 
     /**
      * Wait for a given process.
-     *
-     * @param process the process one wants to wait for.
+     * @param process the process to wait for
      */
     @Nullable
     private Integer waitFor(Process process) {

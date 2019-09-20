@@ -7,6 +7,11 @@ import java.util.concurrent.TimeoutException;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * Service class that implements a process monitor.
+ * @param <SO> standard output type
+ * @param <SE> standard error type
+ */
 public class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
 
     private final Process process;
@@ -19,29 +24,28 @@ public class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
         this.processTracker = requireNonNull(processTracker);
     }
 
+    @Override
     public Future<ProcessResult<SO, SE>> future() {
         return future;
     }
 
+    @Override
     public ProcessDestructor destructor() {
         return new BasicProcessDestructor(process, processTracker);
     }
 
+    @Override
     public Process process() {
         return process;
     }
 
+    @Override
     public ProcessTracker tracker() {
         return processTracker;
     }
 
-    public static class ProcessExecutionInnerException extends Subprocess.SubprocessExecutionException {
-        public ProcessExecutionInnerException(Throwable cause) {
-            super(cause);
-        }
-    }
-
-    public ProcessResult<SO, SE> await(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException, ProcessExecutionInnerException {
+    @Override
+    public ProcessResult<SO, SE> await(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException, SubprocessExecutionException {
         try {
             boolean ok = process.waitFor(timeout, unit);
             if (!ok) {
@@ -49,15 +53,16 @@ public class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
             }
             return future().get();
         } catch (ExecutionException e) {
-            throw new ProcessExecutionInnerException(e.getCause());
+            throw new SubprocessExecutionException(e.getCause());
         }
     }
 
+    @Override
     public ProcessResult<SO, SE> await() throws SubprocessException, InterruptedException {
         try {
             return future().get();
         } catch (ExecutionException e) {
-            throw new ProcessExecutionInnerException(e.getCause());
+            throw new SubprocessExecutionException(e.getCause());
         }
     }
 }

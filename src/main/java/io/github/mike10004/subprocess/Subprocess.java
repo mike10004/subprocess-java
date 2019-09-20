@@ -157,24 +157,6 @@ public class Subprocess {
         return monitor;
     }
 
-    /**
-     * Exception thrown if an error occurs during process execution.
-     */
-    @SuppressWarnings("unused")
-    public static class SubprocessExecutionException extends SubprocessException {
-        public SubprocessExecutionException(String message) {
-            super(message);
-        }
-
-        public SubprocessExecutionException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public SubprocessExecutionException(Throwable cause) {
-            super(cause);
-        }
-    }
-
 
     /**
      * Class that represents a builder of program instances. Create a builder

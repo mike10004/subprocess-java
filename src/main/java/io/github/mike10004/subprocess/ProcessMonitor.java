@@ -47,32 +47,23 @@ public interface ProcessMonitor<SO, SE> {
     ProcessTracker tracker();
 
     /**
-     * Exception that wraps an execution exception when acquiring an asynchronous result.
-     * @see java.util.concurrent.Future#get()
-     * @see java.util.concurrent.ExecutionException
-     */
-    class ProcessExecutionInnerException extends Subprocess.SubprocessExecutionException {
-        public ProcessExecutionInnerException(Throwable cause) {
-            super(cause);
-        }
-    }
-
-    /**
      * Blocks on this thread, waiting for the process to finish or the given timeout to elapse.
      * @param timeout the timeout
      * @param unit the timeout duration unit
      * @return the process result
      * @throws TimeoutException if the timeout elapses before the process finishes
      * @throws InterruptedException if the waiting is interrupted
-     * @throws ProcessExecutionInnerException if there is an execution exception in the process execution thread
+     * @throws SubprocessExecutionException if an execution exception is thrown on the process execution thread
      */
-    ProcessResult<SO, SE> await(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException, ProcessExecutionInnerException;
+    ProcessResult<SO, SE> await(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException, SubprocessExecutionException;
 
     /**
      * Blocks on this thread, waiting for the process to finish.
+     * Avoid using this method; favor the overload that accepts a timeout, as
+     * it's probably never a good idea to wait forever for anything.
      * @return the process result
-     * @throws SubprocessException if there is an execution exception in the process execution thread
      * @throws InterruptedException if the waiting is interrupted
+     * @throws SubprocessExecutionException if an execution exception is thrown on the process execution thread
      */
-    ProcessResult<SO, SE> await() throws SubprocessException, InterruptedException;
+    ProcessResult<SO, SE> await() throws InterruptedException, SubprocessExecutionException;
 }
