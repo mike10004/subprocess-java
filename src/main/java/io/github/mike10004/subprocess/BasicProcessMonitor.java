@@ -35,7 +35,7 @@ public class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
         return processTracker;
     }
 
-    public static class ProcessExecutionInnerException extends Subprocess.ProcessExecutionException {
+    public static class ProcessExecutionInnerException extends Subprocess.SubprocessExecutionException {
         public ProcessExecutionInnerException(Throwable cause) {
             super(cause);
         }
@@ -53,7 +53,7 @@ public class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
         }
     }
 
-    public ProcessResult<SO, SE> await() throws ProcessException, InterruptedException {
+    public ProcessResult<SO, SE> await() throws SubprocessException, InterruptedException {
         try {
             return future().get();
         } catch (ExecutionException e) {

@@ -118,9 +118,9 @@ public class Subprocess {
      * and invoke {@link Launcher#launch()} for a more fluent way of executing this method.
      * @param processTracker a process tracker
      * @return a process monitor
-     * @throws ProcessException
+     * @throws SubprocessException
      */
-    public ProcessMonitor<Void, Void> launch(ProcessTracker processTracker) throws ProcessException {
+    public ProcessMonitor<Void, Void> launch(ProcessTracker processTracker) throws SubprocessException {
         StreamContext<?, Void, Void> sinkhole = StreamContexts.sinkhole();
         return launch(processTracker, sinkhole);
     }
@@ -135,14 +135,14 @@ public class Subprocess {
      * @param <SO> type of captured standard output content
      * @param <SE> type of captured standard error content
      * @return a process monitor
-     * @throws ProcessException if the process cannot be launched
+     * @throws SubprocessException if the process cannot be launched
      */
-    public <C extends StreamControl, SO, SE> ProcessMonitor<SO, SE> launch(ProcessTracker processTracker, StreamContext<C, SO, SE> streamContext) throws ProcessException {
+    public <C extends StreamControl, SO, SE> ProcessMonitor<SO, SE> launch(ProcessTracker processTracker, StreamContext<C, SO, SE> streamContext) throws SubprocessException {
         C streamControl;
         try {
             streamControl = streamContext.produceControl();
         } catch (IOException e) {
-            throw new ProcessLaunchException("failed to produce output context", e);
+            throw new SubprocessLaunchException("failed to produce output context", e);
         }
         // a one-time use executor service; it is shutdown immediately after exactly one task is submitted
         ExecutorService launchExecutorService = launchExecutorServiceFactory.get();
@@ -161,16 +161,16 @@ public class Subprocess {
      * Exception thrown if an error occurs during process execution.
      */
     @SuppressWarnings("unused")
-    public static class ProcessExecutionException extends ProcessException {
-        public ProcessExecutionException(String message) {
+    public static class SubprocessExecutionException extends SubprocessException {
+        public SubprocessExecutionException(String message) {
             super(message);
         }
 
-        public ProcessExecutionException(String message, Throwable cause) {
+        public SubprocessExecutionException(String message, Throwable cause) {
             super(message, cause);
         }
 
-        public ProcessExecutionException(Throwable cause) {
+        public SubprocessExecutionException(Throwable cause) {
             super(cause);
         }
     }
@@ -364,9 +364,9 @@ public class Subprocess {
         /**
          * Launches the process.
          * @return the process monitor
-         * @throws ProcessException  if there is an error that prevents the process from being launched
+         * @throws SubprocessException  if there is an error that prevents the process from being launched
          */
-        public ProcessMonitor<SO, SE> launch() throws ProcessException {
+        public ProcessMonitor<SO, SE> launch() throws SubprocessException {
             return Subprocess.this.launch(processTracker, streamContext);
         }
 

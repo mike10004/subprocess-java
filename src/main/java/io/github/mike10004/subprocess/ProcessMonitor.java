@@ -51,7 +51,7 @@ public interface ProcessMonitor<SO, SE> {
      * @see java.util.concurrent.Future#get()
      * @see java.util.concurrent.ExecutionException
      */
-    class ProcessExecutionInnerException extends Subprocess.ProcessExecutionException {
+    class ProcessExecutionInnerException extends Subprocess.SubprocessExecutionException {
         public ProcessExecutionInnerException(Throwable cause) {
             super(cause);
         }
@@ -71,8 +71,8 @@ public interface ProcessMonitor<SO, SE> {
     /**
      * Blocks on this thread, waiting for the process to finish.
      * @return the process result
-     * @throws ProcessException if there is an execution exception in the process execution thread
+     * @throws SubprocessException if there is an execution exception in the process execution thread
      * @throws InterruptedException if the waiting is interrupted
      */
-    ProcessResult<SO, SE> await() throws ProcessException, InterruptedException;
+    ProcessResult<SO, SE> await() throws SubprocessException, InterruptedException;
 }

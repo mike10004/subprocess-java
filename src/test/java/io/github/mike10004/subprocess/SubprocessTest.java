@@ -213,7 +213,7 @@ public class SubprocessTest extends SubprocessTestBase {
         return CharMatcher.inRange('a', 'z').or(CharMatcher.inRange('A', 'Z')).or(CharMatcher.inRange('0', '9'));
     }
 
-    @Test(expected = ProcessLaunchException.class)
+    @Test(expected = SubprocessLaunchException.class)
     public void launch_notAnExecutable() throws Exception {
         String executable  = "e" + alphanumeric().retainFrom(UUID.randomUUID().toString());
         Subprocess.running(executable).build().launcher(TRACKER).launch();

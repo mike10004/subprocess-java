@@ -19,7 +19,7 @@ public class SubprocessLauncherTest {
         StreamContext<?, String, String> ctx = StreamContexts.predefined(ctrl, () -> "5", () -> "true");
         Subprocess.Launcher<Integer, Boolean> launcher = p.new Launcher<String, String>(EasyMock.createMock(ProcessTracker.class), ctx) {
             @Override
-            public ProcessMonitor<String, String> launch() throws ProcessException {
+            public ProcessMonitor<String, String> launch() throws SubprocessException {
                 return new CannedMonitor<>(ProcessResult.direct(0, "5", "true"));
             }
         }.map(Integer::valueOf, Boolean::parseBoolean);
@@ -63,7 +63,7 @@ public class SubprocessLauncherTest {
         }
 
         @Override
-        public ProcessResult<SO, SE> await() throws ProcessException {
+        public ProcessResult<SO, SE> await() throws SubprocessException {
             return result;
         }
     }

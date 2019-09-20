@@ -90,7 +90,7 @@ class ProcessMissionControl {
         }
     }
 
-    static class ProcessStartException extends ProcessLaunchException {
+    static class ProcessStartException extends SubprocessLaunchException {
         public ProcessStartException(IOException cause) {
             super(cause);
         }
@@ -100,7 +100,7 @@ class ProcessMissionControl {
      * Runs a process and returns its exit status.
      *
      * @return the exit status of the subprocess or null if the process did
-     * @exception ProcessException The exception is thrown, if launching
+     * @exception SubprocessException The exception is thrown, if launching
      *            of the subprocess failed.
      */
     @VisibleForTesting
@@ -114,7 +114,7 @@ class ProcessMissionControl {
         return process;
     }
 
-    static class InvalidWorkingDirectoryException extends ProcessLaunchException {
+    static class InvalidWorkingDirectoryException extends SubprocessLaunchException {
         public InvalidWorkingDirectoryException(File workingDirectory) {
             super("specified working directory " + workingDirectory + " is not a directory; is file? " + workingDirectory.isFile());
         }
