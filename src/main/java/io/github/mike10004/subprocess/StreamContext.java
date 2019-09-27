@@ -2,7 +2,6 @@ package io.github.mike10004.subprocess;
 
 import java.io.IOException;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Interface that defines methods for manipulating process output.

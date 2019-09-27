@@ -171,7 +171,7 @@ class ProcessMissionControl {
                 destroy(process);
             }
             processTracker.remove(process);
-            closeStreams(processStdin, processStdout, processStderr);
+            Streams.closeAllAndIgnoreErrors(processStdin, processStdout, processStderr);
         }
         if (exitVal == null) {
             throw new IllegalProcessStateException("no way to wait for process; probably interrupted in ProcessMissionControl.waitFor");
@@ -214,14 +214,4 @@ class ProcessMissionControl {
         }
     }
 
-    private static void closeStreams(java.io.Closeable...streams) {
-        for (java.io.Closeable stream : streams) {
-            try {
-                if (stream != null) {
-                    stream.close();
-                }
-            } catch (IOException ignore) {
-            }
-        }
-    }
 }

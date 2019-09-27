@@ -107,7 +107,7 @@ class BlockingStreamPumper implements Runnable {
             }
         } finally {
             if (closeWhenExhausted) {
-                AntFileUtils.close(os);
+                Streams.close(os);
             }
             finished = true;
             finish = false;

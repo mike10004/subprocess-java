@@ -186,6 +186,36 @@ class Streams {
         return out.toByteArray();
     }
 
+    /**
+     * Close an {@link AutoCloseable} without throwing any exception
+     * if something went wrong.  Do not attempt to close it if the
+     * argument is null.
+     *
+     * @param ac AutoCloseable, can be null.
+     * @since Ant 1.10.0
+     * @author Apache Ant authors https://ant.apache.org/
+     */
+    public static void close(AutoCloseable ac) {
+        if (null != ac) {
+            try {
+                ac.close();
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+    }
+
+    public static void closeAllAndIgnoreErrors(java.io.Closeable...streams) {
+        for (java.io.Closeable stream : streams) {
+            try {
+                if (stream != null) {
+                    stream.close();
+                }
+            } catch (IOException ignore) {
+            }
+        }
+    }
+
     static class FileStreamInput implements StreamInput {
 
         private final File file;

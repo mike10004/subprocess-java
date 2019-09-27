@@ -3,6 +3,7 @@ package io.github.mike10004.subprocess;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -15,9 +16,11 @@ import java.util.stream.StreamSupport;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Value class that represents a subprocess to be executed. Instances of this class
- * are immutable and may be reused. This API adheres to an asynchronous model,
- * so after you launch a process, you receive a {@link ProcessMonitor monitor}
+ * Value class that represents the definition of a subprocess to be executed.
+ * Instances of this class are immutable and may be reused.
+ * This API respects the asynchronous nature of launching subprocesses
+ * while supporting usage in a synchronous context.
+ * After you launch a process, you receive a {@link ProcessMonitor monitor}
  * instance that provides methods to block on the current thread or obtain
  * a {@link Future} result.
  *
@@ -221,20 +224,17 @@ public class Subprocess {
 
     }
 
-    /**
-     * Creates a new launcher in the given process context. The launcher
-     * created does not specify that output is to be captured. Use the
-     * {@code Launcher} methods to specify how input is to be sent to the process and how
-     * output is to be captured.
-     * @param launcher the launcher
-     * @return a launch platform
-     */
-    public <SO, SE> SubprocessLaunchSupport<SO, SE> launcher(SubprocessLauncher launcher, StreamContext<?, SO, SE> streamContext) {
+    private <SO, SE> SubprocessLaunchSupport<SO, SE> launcher(SubprocessLauncher launcher, StreamContext<?, SO, SE> streamContext) {
         return new SubprocessLaunchSupport<>(Subprocess.this, launcher, streamContext);
     }
 
     /**
-     * Creates a new launch support that ignores process output.
+     * Creates a new launch support instance that ignores process output.
+     * To capture process output, invoke one of the {@code SubprocessLaunchSupport.output...()}
+     * methods, such as {@link SubprocessLaunchSupport#outputInMemory() outputInMemory()}
+     * to capture standard output and standard error as byte arrays, or
+     * {@link SubprocessLaunchSupport#outputStrings(Charset) outputStrings(Charset)}
+     * to capture output as strings.
      * @param launcher the launcher
      * @return a new launch support instance
      * @see #launcher(SubprocessLauncher, StreamContext)

@@ -10,7 +10,8 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Support class that provides a fluent interface to launch a process. This is essentially
- * a builder of the stream context.
+ * a builder of the stream context. Instances of this class are immutable,
+ * so the fluent API must be used.
  * @param <SO> standard output capture type
  * @param <SE> standard error capture type
  */
@@ -48,7 +49,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * @return a new launcher instance
      */
     public <S> UniformSubprocessLaunchSupport<S> uniformOutput(StreamContext<?, S, S> streamContext) {
-        return new UniformSubprocessLaunchSupport<S>(subprocess, launcher, streamContext);
+        return new UniformSubprocessLaunchSupport<>(subprocess, launcher, streamContext);
     }
 
     /**
@@ -75,11 +76,15 @@ public class SubprocessLaunchSupport<SO, SE> {
     }
 
     /**
-     * Returns a new launcher that captures process standard output and error as strings.
+     * Returns a new launcher that captures the content of process standard output
+     * and error streams in memory as strings.
      * The specified characer encoding is used to decode the bytes collected from the
-     * process standard output and standard error streams.
+     * process standard output and standard error streams. In many cases an external
+     * process will write text output in the platform-default encoding, which can be
+     * obtained by {@link Charset#defaultCharset()}. Use a different argument if you
+     * know the encoding with which the program writes its output.
      * @param charset encoding of bytes on the process standard output and error streams
-     * @return a new launcher instance
+     * @return a new launch support instance
      * @see #outputStrings(Charset, StreamInput)
      */
     public UniformSubprocessLaunchSupport<String> outputStrings(Charset charset) {
@@ -88,12 +93,12 @@ public class SubprocessLaunchSupport<SO, SE> {
     }
 
     /**
-     * Returns a new launcher that captures process standard output and error as strings.
+     * Returns a new launcher that captures the content of process standard output and error as strings.
      * The specified characer encoding is used to decode the bytes collected from the
      * process standard output and standard error streams.
      * @param charset encoding of bytes on the process standard output and error streams
      * @param stdin source providing bytes to be written on process standard input stream; may be null
-     * @return a new launcher instance
+     * @return a new launch support instance
      */
     public UniformSubprocessLaunchSupport<String> outputStrings(Charset charset, @Nullable StreamInput stdin) {
         requireNonNull(charset, "charset");
@@ -101,8 +106,9 @@ public class SubprocessLaunchSupport<SO, SE> {
     }
 
     /**
-     * Returns a new launcher that captures process standard output and error as byte arrays.
-     * @return a new launcher instance
+     * Returns a new launcher that captures the content of the process standard
+     * output and error streams in memory as byte arrays.
+     * @return a new launch support instance
      * @see #outputInMemory(StreamInput)
      */
     public UniformSubprocessLaunchSupport<byte[]> outputInMemory() {
@@ -112,7 +118,7 @@ public class SubprocessLaunchSupport<SO, SE> {
     /**
      * Returns a new launcher that captures process standard output and error as byte arrays.
      * @param stdin source providing bytes to be written on process standard input stream; may be null
-     * @return a new launcher instance
+     * @return a new launch support instance
      */
     public UniformSubprocessLaunchSupport<byte[]> outputInMemory(@Nullable StreamInput stdin) {
         UniformStreamContext<?, byte[]> m = StreamContexts.byteArrays(stdin);
@@ -122,7 +128,7 @@ public class SubprocessLaunchSupport<SO, SE> {
     /**
      * Returns a new launcher that pipes process output to the JVM standard output and errors streams and
      * pipes input from the JVM standard input stream to the process standard input stream.
-     * @return a new launcher instance
+     * @return a new launch support instance
      */
     @SuppressWarnings("unused")
     public SubprocessLaunchSupport<Void, Void> inheritAllStreams() {
@@ -132,7 +138,7 @@ public class SubprocessLaunchSupport<SO, SE> {
     /**
      * Returns a new launcher that pipes process output to the JVM standard output and errors streams
      * but does not write anything on the process standard input stream.
-     * @return a new launcher instance
+     * @return a new launch support instance
      */
     public SubprocessLaunchSupport<Void, Void> inheritOutputStreams() {
         return output(StreamContexts.inheritOutputs());
@@ -144,7 +150,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * @param stdoutFile the file to which standard output content is to be written
      * @param stderrFile the file to which standard error content is to be written
      * @param stdin source providing bytes to be written on process standard input stream; may be null
-     * @return a new launcher instance
+     * @return a new launch support instance
      */
     public UniformSubprocessLaunchSupport<File> outputFiles(File stdoutFile, File stderrFile, @Nullable StreamInput stdin) {
         return output(StreamContexts.outputFiles(stdoutFile, stderrFile, stdin));
@@ -155,7 +161,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * in files.
      * @param stdoutFile the file to which standard output content is to be written
      * @param stderrFile the file to which standard error content is to be written
-     * @return a new launcher instance
+     * @return a new launch support instance
      * @see #outputFiles(File, File, StreamInput)
      */
     public UniformSubprocessLaunchSupport<File> outputFiles(File stdoutFile, File stderrFile) {
@@ -166,7 +172,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * Returns a new launcher that captures the process standard output and error content
      * in new, uniquely-named files created in the given directory.
      * @param directory pathname of a existing directory in which files are to be created
-     * @return a new launcher instance
+     * @return a new launch support instance
      */
     public UniformSubprocessLaunchSupport<File> outputTempFiles(Path directory) {
         return outputTempFiles(directory, null);
@@ -177,7 +183,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * in new, uniquely-named files created in the given directory.
      * @param directory pathname of a existing directory in which files are to be created
      * @param stdin source providing bytes to be written on process standard input stream; may be null
-     * @return a new launcher instance
+     * @return a new launch support instance
      */
     public UniformSubprocessLaunchSupport<File> outputTempFiles(Path directory, @Nullable StreamInput stdin) {
         return output(StreamContexts.outputTempFiles(directory, stdin));

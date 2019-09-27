@@ -80,7 +80,7 @@ class StreamConduit {
         if (input != null) {
             inputThread = createPump(input, os, true);
         } else {
-            AntFileUtils.close(os);
+            Streams.close(os);
         }
     }
 

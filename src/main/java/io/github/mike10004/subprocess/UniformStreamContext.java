@@ -19,8 +19,8 @@ public interface UniformStreamContext<C extends StreamControl, S> extends Stream
      * @param <S> type of captured standard output and standard error content
      * @return a new uniform stream context
      */
-    static <C extends StreamControl, S> io.github.mike10004.subprocess.UniformStreamContext<C, S> wrap(StreamContext<C, S, S> homogenous) {
-        return new io.github.mike10004.subprocess.UniformStreamContext<C, S>() {
+    static <C extends StreamControl, S> UniformStreamContext<C, S> wrap(StreamContext<C, S, S> homogenous) {
+        return new UniformStreamContext<C, S>() {
             @Override
             public C produceControl() throws IOException {
                 return homogenous.produceControl();
