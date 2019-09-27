@@ -317,6 +317,12 @@
             <version>3.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.mike10004</groupId>
+            <artifactId>nitsick-junit</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

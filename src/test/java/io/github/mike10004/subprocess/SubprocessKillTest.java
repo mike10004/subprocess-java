@@ -1,5 +1,6 @@
 package io.github.mike10004.subprocess;
 
+import io.github.mike10004.nitsick.junit.TimeoutRules;
 import io.github.mike10004.subprocess.test.Tests;
 import org.junit.Assume;
 import org.junit.Rule;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 public class SubprocessKillTest extends SubprocessTestBase {
 
     @Rule
-    public final Timeout timeout = Tests.Timeouts.mediumRule();
+    public final Timeout timeout = TimeoutRules.from(Tests.Settings).getMediumRule();
 
     public SubprocessKillTest(int trial) {
         super(trial);
@@ -47,7 +48,7 @@ public class SubprocessKillTest extends SubprocessTestBase {
                 .inheritOutputStreams()
                 .launch();
         System.out.println("waiting for pid to be printed...");
-        String pid = Tests.readWhenNonempty(pidFile);
+        String pid = Tests.readWhenNonempty(pidFile, 1, US_ASCII);
         System.out.format("pid printed: %s%n", pid);
         SigtermAttempt termAttempt = monitor.destructor().sendTermSignal();
         assertEquals("should still be alive after SIGTERM", DestroyResult.STILL_ALIVE, termAttempt.result());

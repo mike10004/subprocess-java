@@ -1,5 +1,6 @@
 package io.github.mike10004.subprocess;
 
+import io.github.mike10004.nitsick.junit.TimeoutRules;
 import io.github.mike10004.subprocess.test.Tests;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertNull;
 public class SubprocessAwaitTest extends SubprocessTestBase {
 
     @Rule
-    public final Timeout timeout = Tests.Timeouts.mediumRule();
+    public final Timeout timeout = TimeoutRules.from(Tests.Settings).getMediumRule();
 
     public SubprocessAwaitTest(int trial) {
         super(trial);

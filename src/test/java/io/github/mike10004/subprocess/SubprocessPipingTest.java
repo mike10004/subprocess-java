@@ -2,6 +2,7 @@ package io.github.mike10004.subprocess;
 
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import io.github.mike10004.nitsick.junit.TimeoutRules;
 import io.github.mike10004.subprocess.test.Tests;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 public class SubprocessPipingTest extends SubprocessTestBase {
 
     @Rule
-    public Timeout timeout = Tests.Timeouts.mediumRule();
+    public Timeout timeout = TimeoutRules.from(Tests.Settings).getMediumRule();
 
     public SubprocessPipingTest(int trial) {
         super(trial);
@@ -41,7 +42,7 @@ public class SubprocessPipingTest extends SubprocessTestBase {
                 .outputStrings(charset, pipe.asByteSource())
                 .launch();
         List<String> lines = Arrays.asList("foo", "bar", "baz", "");
-        PrintWriter printer = new PrintWriter(new OutputStreamWriter(pipe.connect(Tests.Timeouts.brief()), charset));
+        PrintWriter printer = new PrintWriter(new OutputStreamWriter(pipe.connect(Tests.Settings.timeouts().getShort()), charset));
         for (String line : lines) {
             printer.println(line);
             printer.flush();
@@ -90,7 +91,7 @@ public class SubprocessPipingTest extends SubprocessTestBase {
         Charset charset = Charset.defaultCharset();
         List<String> actualLines;
         // read from the process output stream while the process executes
-        try (Reader reader = new InputStreamReader(stdoutPipe.connect(Tests.Timeouts.brief()), charset)) {
+        try (Reader reader = new InputStreamReader(stdoutPipe.connect(Tests.Settings.timeouts().getShort()), charset)) {
             /*
              * It's possible to get an IOException here when the process has not yet finished
              * (so PipedOutputStream.receivedLast has not been invoked) but the thread on which
@@ -125,8 +126,8 @@ public class SubprocessPipingTest extends SubprocessTestBase {
         Charset charset = Charset.defaultCharset();
         System.out.format("expecting poem: %n%s%n", String.join(System.lineSeparator(), poemLines));
         List<String> actualLines = new ArrayList<>(poemLines.size());
-        try (PrintWriter pipeWriter = new PrintWriter(new OutputStreamWriter(stdinPipe.connect(Tests.Timeouts.brief()), charset));
-             BufferedReader pipeReader = new BufferedReader(new InputStreamReader(stdoutPipe.connect(Tests.Timeouts.brief()), charset))) {
+        try (PrintWriter pipeWriter = new PrintWriter(new OutputStreamWriter(stdinPipe.connect(Tests.Settings.timeouts().getShort()), charset));
+             BufferedReader pipeReader = new BufferedReader(new InputStreamReader(stdoutPipe.connect(Tests.Settings.timeouts().getShort()), charset))) {
             for (String line : poemLines) {
                 pipeWriter.println(line);
                 pipeWriter.flush();
