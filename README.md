@@ -21,7 +21,7 @@ Include the dependency with
     <dependency>
         <groupId>com.github.mike10004</groupId>
         <artifactId>subprocess</artifactId>
-        <version>0.1</version>
+        <version>0.2-SNAPSHOT</version>
     <dependency>
 
 and use  
