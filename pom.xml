@@ -320,7 +320,7 @@
         <dependency>
             <groupId>com.github.mike10004</groupId>
             <artifactId>nitsick-junit</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
