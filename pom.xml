@@ -38,6 +38,26 @@
                 <python.executable>python3</python.executable>
             </properties>
         </profile>
+        <profile>
+            <id>tests-disable-timeouts</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <systemPropertyVariables>
+                                    <subprocess.tests.timeout.short>60min</subprocess.tests.timeout.short>
+                                    <subprocess.tests.timeout.medium>60min</subprocess.tests.timeout.medium>
+                                    <subprocess.tests.timeout.long>60min</subprocess.tests.timeout.long>
+                                </systemPropertyVariables>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+
+        </profile>
     </profiles>
     <inceptionYear>2018</inceptionYear>
     <licenses>
@@ -308,7 +328,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>23.6-jre</version>
+            <version>28.1-jre</version>
             <scope>test</scope>
         </dependency>
         <dependency>
