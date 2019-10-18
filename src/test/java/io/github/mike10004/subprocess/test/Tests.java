@@ -11,13 +11,22 @@ import io.github.mike10004.subprocess.test.Poller.PollOutcome;
 import io.github.mike10004.subprocess.test.Poller.StopReason;
 import org.apache.commons.lang3.SystemUtils;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -71,6 +80,10 @@ public class Tests {
 
     public static String joinPlus(String delimiter, Iterable<String> items) {
         return String.join(delimiter, items) + delimiter;
+    }
+
+    public static File pyEcho() {
+        return getPythonFile("nht_echo.py");
     }
 
     public static File pyCat() {
@@ -183,4 +196,75 @@ public class Tests {
         return SystemUtils.IS_OS_LINUX;
     }
 
+    public static void dump(ProcessResult<?, ?> result, PrintStream out, PrintStream err) {
+        String boundary = "=========================================================================";
+        out.println(boundary);
+        out.format("exit code %d%n", result.exitCode());
+        out.println(boundary);
+        out.println(boundary);
+        out.print(nullToEmpty(result.content().stdout()));
+        out.println(boundary);
+        err.println(boundary);
+        err.print(nullToEmpty(result.content().stderr()));
+        err.println(boundary);
+        err.println(boundary);
+    }
+
+    private static String nullToEmpty(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        return obj.toString();
+    }
+
+    private static boolean isSameFile(Path path, File file) throws IOException {
+        return path.toFile().getCanonicalFile().equals(file.getCanonicalFile());
+    }
+
+    /**
+     * Waits for a pidFile to become
+     * @param pidFile
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public static int waitForSignalListenerPid(File pidFile) throws InterruptedException, IOException {
+        @Nullable Integer pid = waitForFileChange(pidFile, path -> {
+            String content;
+            try {
+                byte[] bytes = java.nio.file.Files.readAllBytes(path);
+                content = new String(bytes, US_ASCII);
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+                return null;
+            }
+            if (content.endsWith(System.lineSeparator())) {
+                return Integer.parseInt(content.trim());
+            }
+            return null;
+        });
+        return pid.intValue();
+    }
+
+    public static <T> T waitForFileChange(File watchedFile, Function<Path, T> reader) throws InterruptedException, IOException {
+        Path pidFileParent = watchedFile.getParentFile().toPath();
+        try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
+            final WatchKey watchKey = pidFileParent.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+            while (true) {
+                final WatchKey wk = watchService.take();
+                for (WatchEvent<?> event : wk.pollEvents()) {
+                    //we only register "ENTRY_MODIFY" so the context is always a Path.
+                    Path changed = (Path) event.context();
+                    changed = pidFileParent.resolve(changed);
+                    System.out.format("file changed: %s%n", changed);
+                    if (isSameFile(changed, watchedFile)) {
+                        T content = reader.apply(changed);
+                        if (content != null) {
+                            return content;
+                        }
+                    } else System.err.format("not the same file (expect %s)%n", watchedFile);
+                }
+                wk.reset();
+            }
+        }
+    }
 }

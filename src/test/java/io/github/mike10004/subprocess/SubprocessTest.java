@@ -54,7 +54,7 @@ public class SubprocessTest extends SubprocessTestBase {
     }
 
     private static File pyEcho() {
-        return Tests.getPythonFile("nht_echo.py");
+        return Tests.pyEcho();
     }
 
     private static File pyTrue() {

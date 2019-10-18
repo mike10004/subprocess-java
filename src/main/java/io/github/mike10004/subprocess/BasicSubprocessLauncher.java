@@ -12,12 +12,42 @@ import static java.util.Objects.requireNonNull;
  */
 public class BasicSubprocessLauncher implements SubprocessLauncher {
 
+    private static final String THREAD_POOL_NAME = "subprocess-launcher";
+
     private final ProcessTracker processTracker;
     private final Supplier<? extends ExecutorService> launchExecutorServiceFactory;
 
+    /**
+     * Constructs an instance with the given process tracker and a new executor
+     * service factory that constructs a new single thread executor.
+     * @param processTracker the process tracker
+     * @see java.util.concurrent.Executors#newSingleThreadExecutor
+     */
     public BasicSubprocessLauncher(ProcessTracker processTracker) {
-        launchExecutorServiceFactory = ExecutorServices.newSingleThreadExecutorServiceFactory("subprocess-launcher");
+        this(processTracker, ExecutorServices.newSingleThreadExecutorServiceFactory(THREAD_POOL_NAME));
+    }
+
+    /**
+     * Constructs an instance with the given process tracker and executor service factory.
+     * The factory provides the executor service to which the task of blocking until
+     * the process completes is performed. After that task has completed, the executor
+     * service is shut down and is not reused.
+     * @param processTracker process tracker
+     * @param launchExecutorServiceFactory executor service factory
+     */
+    protected BasicSubprocessLauncher(ProcessTracker processTracker, Supplier<? extends ExecutorService> launchExecutorServiceFactory) {
+        this.launchExecutorServiceFactory = requireNonNull(launchExecutorServiceFactory, "launchExecutorServiceFactory");
         this.processTracker = requireNonNull(processTracker, "processTracker");
+    }
+
+    /**
+     * Gets the default thread pool name. If an instance of this class is constructed
+     * with the the default executor service, then this string is used as a prefix
+     * for the thread names that the executor service creates.
+     * @return the default thread pool name
+     */
+    public static String getDefaultThreadPoolName() {
+        return THREAD_POOL_NAME;
     }
 
     @Override
@@ -30,7 +60,7 @@ public class BasicSubprocessLauncher implements SubprocessLauncher {
         }
         // a one-time use executor service; it is shutdown immediately after exactly one task is submitted
         ExecutorService launchExecutorService = launchExecutorServiceFactory.get();
-        ProcessMissionControl.Execution<SO, SE> execution = new ProcessMissionControl(subprocess, processTracker, launchExecutorService)
+        ProcessExecution<SO, SE> execution = new ProcessMissionControl(subprocess, processTracker, launchExecutorService)
                 .launch(streamControl, exitCode -> {
                     StreamContent<SO, SE> content = streamContext.transform(exitCode, streamControl);
                     return ProcessResult.direct(exitCode, content);

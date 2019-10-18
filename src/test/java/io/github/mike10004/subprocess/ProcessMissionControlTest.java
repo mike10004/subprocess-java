@@ -26,7 +26,7 @@ public class ProcessMissionControlTest {
         ProcessMissionControl executor = new ProcessMissionControl(subprocess, PROCESS_TRACKER, createExecutorService());
         ByteBucket stdout = ByteBucket.create(), stderr = ByteBucket.create();
         PredefinedStreamControl endpoints = new PredefinedStreamControl(stdout, stderr, null);
-        ProcessMissionControl.Execution<?, ?> execution = executor.launch(endpoints, exitCode -> ProcessResult.direct(exitCode, null, null));
+        ProcessExecution<?, ?> execution = executor.launch(endpoints, exitCode -> ProcessResult.direct(exitCode, null, null));
         int exitCode = execution.getFuture().get().exitCode();
         assertEquals("exitcode", 0, exitCode);
         String actual = new String(stdout.dump(), US_ASCII);
@@ -43,7 +43,7 @@ public class ProcessMissionControlTest {
         @SuppressWarnings("unchecked")
         StreamContext<StreamContexts.BucketContext, StreamInput, StreamInput> ctrl = (StreamContext<StreamContexts.BucketContext, StreamInput, StreamInput>) StreamContexts.memoryByteSources(null);
         StreamControl outputcontext = ctrl.produceControl();
-        ProcessMissionControl.Execution<StreamInput, StreamInput> execution = executor.launch(outputcontext, c -> {
+        ProcessExecution<StreamInput, StreamInput> execution = executor.launch(outputcontext, c -> {
                     StreamContent<StreamInput, StreamInput> xformed = ctrl.transform(c, (StreamContexts.BucketContext) outputcontext);
                     return ProcessResult.direct(c, xformed);
                 });
@@ -65,7 +65,7 @@ public class ProcessMissionControlTest {
                 .stdin(StreamInput.wrap(input))
                 .stdout(stdoutBucket)
                 .build();
-        ProcessMissionControl.Execution<Void, Void> execution = executor.launch(endpoints, c -> ProcessResult.direct(c, null, null));
+        ProcessExecution<Void, Void> execution = executor.launch(endpoints, c -> ProcessResult.direct(c, null, null));
         int exitCode = execution.getFuture().get(5, TimeUnit.SECONDS).exitCode();
         System.out.println(stdoutBucket);
         assertEquals("exitcode", 0, exitCode);

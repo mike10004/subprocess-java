@@ -39,12 +39,7 @@ class ProcessMissionControl {
         this.terminationWaitingService = requireNonNull(terminationWaitingService);
     }
 
-    public interface Execution<SO, SE> {
-        Process getProcess();
-        Future<ProcessResult<SO, SE>> getFuture();
-    }
-
-    public <SO, SE> Execution<SO, SE> launch(StreamControl streamControl, Function<? super Integer, ? extends ProcessResult<SO, SE>> resultTransform) {
+    public <SO, SE> ProcessExecution<SO, SE> launch(StreamControl streamControl, Function<? super Integer, ? extends ProcessResult<SO, SE>> resultTransform) {
         Process process = execute();
         Future<ProcessResult<SO, SE>> future = terminationWaitingService.submit(new Callable<ProcessResult<SO, SE>>(){
             @Override
@@ -53,7 +48,7 @@ class ProcessMissionControl {
                 return resultTransform.apply(exitCode);
             }
         });
-        return new Execution<SO, SE>() {
+        return new ProcessExecution<SO, SE>() {
             @Override
             public Process getProcess() {
                 return process;
