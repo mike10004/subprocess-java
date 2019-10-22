@@ -13,6 +13,7 @@
  */
 package io.github.mike10004.subprocess;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
 
@@ -216,7 +218,7 @@ class Streams {
         }
     }
 
-    static class FileStreamInput implements StreamInput {
+    final static class FileStreamInput implements StreamInput {
 
         private final File file;
 
@@ -227,6 +229,57 @@ class Streams {
         @Override
         public InputStream openStream() throws IOException {
             return new FileInputStream(file);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("FileStreamInput{%s}", file);
+        }
+    }
+
+    final static class EmptyStreamInput implements StreamInput {
+
+        private static final byte[] EMPTY_ARRAY = new byte[0];
+
+        public EmptyStreamInput() {
+        }
+
+        @Override
+        public InputStream openStream() {
+            return new ByteArrayInputStream(EMPTY_ARRAY);
+        }
+
+        @Override
+        public byte[] read()  {
+            return EMPTY_ARRAY;
+        }
+
+        public String toString() {
+            return "EmptyStreamInput{}";
+        }
+    }
+
+    final static class MemoryStreamInput implements StreamInput {
+
+        private final byte[] buffer;
+
+        public MemoryStreamInput(byte[] buffer) {
+            this.buffer = requireNonNull(buffer, "buffer");
+        }
+
+        @Override
+        public InputStream openStream() {
+            return new ByteArrayInputStream(buffer);
+        }
+
+        @Override
+        public byte[] read() {
+            return Arrays.copyOf(buffer, buffer.length);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("MemoryStreamInput{byte[%d]}", buffer.length);
         }
     }
 }

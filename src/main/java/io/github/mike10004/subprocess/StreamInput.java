@@ -1,11 +1,8 @@
 package io.github.mike10004.subprocess;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Interface of a source of a byte stream.
@@ -20,12 +17,11 @@ public interface StreamInput {
     InputStream openStream() throws IOException;
 
     static StreamInput empty() {
-        return () -> new ByteArrayInputStream(new byte[0]);
+        return new Streams.EmptyStreamInput();
     }
 
     static StreamInput wrap(byte[] bytes) {
-        requireNonNull(bytes);
-        return () -> new ByteArrayInputStream(bytes);
+        return new Streams.MemoryStreamInput(bytes);
     }
 
     default byte[] read() throws IOException {
@@ -37,4 +33,5 @@ public interface StreamInput {
     static StreamInput fromFile(File file) {
         return new Streams.FileStreamInput(file);
     }
+
 }

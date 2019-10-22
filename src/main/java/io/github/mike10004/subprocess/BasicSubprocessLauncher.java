@@ -24,7 +24,7 @@ public class BasicSubprocessLauncher implements SubprocessLauncher {
      * @see java.util.concurrent.Executors#newSingleThreadExecutor
      */
     public BasicSubprocessLauncher(ProcessTracker processTracker) {
-        this(processTracker, ExecutorServices.newSingleThreadExecutorServiceFactory(THREAD_POOL_NAME));
+        this(processTracker, createDefaultExecutorServiceFactory());
     }
 
     /**
@@ -38,6 +38,10 @@ public class BasicSubprocessLauncher implements SubprocessLauncher {
     protected BasicSubprocessLauncher(ProcessTracker processTracker, Supplier<? extends ExecutorService> launchExecutorServiceFactory) {
         this.launchExecutorServiceFactory = requireNonNull(launchExecutorServiceFactory, "launchExecutorServiceFactory");
         this.processTracker = requireNonNull(processTracker, "processTracker");
+    }
+
+    protected static Supplier<? extends ExecutorService> createDefaultExecutorServiceFactory() {
+        return ExecutorServices.newSingleThreadExecutorServiceFactory(THREAD_POOL_NAME);
     }
 
     /**
