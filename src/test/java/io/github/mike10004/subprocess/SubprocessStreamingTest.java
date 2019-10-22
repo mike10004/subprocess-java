@@ -25,7 +25,7 @@ public class SubprocessStreamingTest extends SubprocessTestBase {
 
     @Test
     public void testTempFileOutput() throws Exception {
-        Subprocess subprocess = Subprocess.running(Tests.getPythonFile("nht_stereo.py"))
+        Subprocess subprocess = Tests.runningPythonFile("nht_stereo.py")
                 .args("one", "two", "three", "four", "five")
                 .build();
         ProcessResult<File, File> result = subprocess.launcher(TRACKER)

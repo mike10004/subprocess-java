@@ -110,11 +110,23 @@ public class Tests {
         return getPythonFile("nht_signal_listener.py");
     }
 
+    /**
+     * Creates a subprocess builder configured to execute the Python program
+     * from the {@code src/test/python} directory whose filename matches the argument.
+     * @param name filename
+     * @return a builder
+     */
     public static Subprocess.Builder runningPythonFile(String name) {
         File pythonFile = getPythonFile(name);
         return runningPythonFile(pythonFile);
     }
 
+    /**
+     * Creates a subprocess builder configured to execute the Python program
+     * contained in the given Python source file.
+     * @param pythonFile the file
+     * @return a builder
+     */
     public static Subprocess.Builder runningPythonFile(File pythonFile) {
         if (isPlatformWindows()) {
             return getPython3BuilderChecked()
