@@ -9,9 +9,9 @@ import java.util.function.Function;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Support class that provides a fluent interface to launch a process. This is essentially
- * a builder of the stream context. Instances of this class are immutable,
- * so the fluent API must be used.
+ * Support class that provides a fluent interface to launch a process. This is
+ * essentially a builder of the stream context. Instances of this class are
+ * immutable, so the fluent API must be used.
  * @param <SO> standard output capture type
  * @param <SE> standard error capture type
  */

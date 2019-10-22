@@ -1,29 +1,22 @@
 package io.github.mike10004.subprocess.test;
 
 import io.github.mike10004.subprocess.BasicSubprocessLauncher;
+import io.github.mike10004.subprocess.LineConsumerContext;
 import io.github.mike10004.subprocess.ProcessMonitor;
 import io.github.mike10004.subprocess.ProcessResult;
 import io.github.mike10004.subprocess.ScopedProcessTracker;
 import io.github.mike10004.subprocess.SigtermAttempt;
-import io.github.mike10004.subprocess.StreamContent;
-import io.github.mike10004.subprocess.StreamContext;
-import io.github.mike10004.subprocess.StreamControl;
 import io.github.mike10004.subprocess.StreamInput;
 import io.github.mike10004.subprocess.Subprocess;
 import io.github.mike10004.subprocess.SubprocessLauncher;
 
-import javax.annotation.Nullable;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
 
@@ -191,58 +184,31 @@ public class ReadmeExamples {
         public static void main(String[] args) throws Exception {
             System.out.println("readme_example_tailOutput");
             // README_SNIPPET readme_example_tailOutput
-            PipedInputStream pipeInput = new PipedInputStream();
-            StreamControl ctrl = new StreamControl() {
-                @Override
-                public OutputStream openStdoutSink() throws IOException {
-                    return new PipedOutputStream(pipeInput);
-                }
-
-                @Override
-                public OutputStream openStderrSink() {
-                    return System.err; // in real life, you should wrap this with CloseShieldOutputStream to avoid closing JVM stderr
-                }
-
-                @Nullable
-                @Override
-                public InputStream openStdinSource() {
-                    return null;
+            LineConsumerContext ctx = new LineConsumerContext();
+            Consumer<String> filter = line -> {
+                if (Integer.parseInt(line) % 2 == 0) {
+                    System.out.print(line + " ");
                 }
             };
-            StreamContext<StreamControl, Void, Void> ctx = new StreamContext<StreamControl, Void, Void>() {
-                @Override
-                public StreamControl produceControl() throws IOException {
-                    return ctrl;
-                }
-
-                @Override
-                public StreamContent<Void, Void> transform(int exitCode, StreamControl context) {
-                    return StreamContent.absent();
-                }
-            };
-            ProcessResult<Void, Void> result;
+            ExecutorService executorService = Executors.newFixedThreadPool(2);
             try (ScopedProcessTracker processTracker = new ScopedProcessTracker()) {
                 // launch a process that prints a number every second
                 ProcessMonitor<Void, Void> monitor = Subprocess.running("bash")
                         .arg("-c")
-                        .arg("set -e; for N in $(seq 5) ; do sleep 1 ; echo $N ; done")
+                        .arg("set -e; for N in $(seq 5) ; do sleep 0.5 ; echo $N ; done")
                         .build()
                         .launcher(processTracker)
                         .output(ctx)
                         .launch();
-                // Wait for the pipe to be connected; in real life, you should throw exception if this returns false
+                // Wait for the pipe to be connected; in real life, you should throw an exception if this returns false
                 monitor.awaitStreamsAttached(5, TimeUnit.SECONDS);
-                // connect a reader to the piped input stream and echo the process output
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(pipeInput, US_ASCII))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        System.out.println("line: " + line);
-                    }
-                }
-                result = monitor.await();
+                ctx.startRelaying(executorService, filter, ignore -> {});
+                monitor.await();
             }
-            System.out.println("exit code: " + result.exitCode());
+            // prints: 2 4
+            executorService.shutdown();
             // README_SNIPPET readme_example_tailOutput
+            System.out.println();
         }
 
     }
