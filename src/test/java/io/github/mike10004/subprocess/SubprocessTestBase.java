@@ -20,7 +20,11 @@ import static org.junit.Assert.assertEquals;
 /**
  * Base class for subprocess tests. This superclass provides a {@link ProcessTracker} field
  * for test classes to use, and implements a check after each test that confirms that there
- * are no active processes remaining.
+ * are no active processes remaining. It is a parameterized test class, where the parameter
+ * is a trial counter. Because subprocess operations are asynchronous, race conditions arise
+ * from time to time, and they can be difficult to observe without multiple trials.
+ * See {@link Tests#getNumTrials()} for info on how to set/get the number of trials to be
+ * performed for each subclass of this class.
  */
 @RunWith(Parameterized.class)
 public abstract class SubprocessTestBase {

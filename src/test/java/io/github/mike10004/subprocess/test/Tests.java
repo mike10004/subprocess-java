@@ -37,8 +37,24 @@ public class Tests {
 
     private Tests() {}
 
-    public static final SettingSet Settings = SettingSet.global("subprocess.tests");
+    private static final String SYSPROP_DOMAIN = "subprocess.tests";
 
+    /**
+     * Test settings set. When we refer to a test setting {@code x}, the way to
+     * assign a value for that setting is to define system property {@code subprocess.tests.x}
+     * or environment variable {@code SUBPROCESS_TESTS_X}.
+     */
+    public static final SettingSet Settings = SettingSet.global(SYSPROP_DOMAIN);
+
+    /**
+     * Gets the number of trials to be performed for each test that supports
+     * multiple trials. All subclasses of {@link io.github.mike10004.subprocess.SubprocessTestBase}
+     * support multiple trials.
+     *
+     * Use test setting {@code trials} to set this parameter.
+     * @return the number of trials to be performed
+     * @see #Settings
+     */
     public static int getNumTrials() {
         return Settings.get("trials", 1);
     }
