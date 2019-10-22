@@ -21,8 +21,8 @@ class StreamContexts {
         return NO_OUTPUT;
     }
 
-    public static StreamContext<? extends StreamControl, Void, Void> sinkhole() {
-        return predefined(PredefinedStreamControl.nullWithNullInput(), StreamContexts::noOutput);
+    public static NonCapturingStreamContext<? extends StreamControl> sinkhole() {
+        return predefinedNonCapturing(PredefinedStreamControl.nullWithNullInput());
     }
 
     public static UniformStreamContext<? extends StreamControl, StreamInput> memoryByteSources(@Nullable StreamInput stdin) {
@@ -99,6 +99,15 @@ class StreamContexts {
         };
     }
 
+    public static <C extends StreamControl> NonCapturingStreamContext<C> predefinedNonCapturing(C streamControl) {
+        return new NonCapturingStreamContext<C>() {
+            @Override
+            public C produceControl() throws IOException {
+                return streamControl;
+            }
+        };
+    }
+
     @VisibleForTesting
     static class BucketContext extends PredefinedStreamControl {
 
@@ -137,11 +146,11 @@ class StreamContexts {
         return byteArrays(stdin).map(bytes -> new String(bytes, charset));
     }
 
-    public static StreamContext<? extends StreamControl, Void, Void> inheritOutputs() {
-        return predefined(PredefinedStreamControl.builder().inheritStderr().inheritStdout().build(), StreamContexts::noOutput);    }
+    public static NonCapturingStreamContext<? extends StreamControl> inheritOutputs() {
+        return predefinedNonCapturing(PredefinedStreamControl.builder().inheritStderr().inheritStdout().build());    }
 
-    public static StreamContext<? extends StreamControl, Void, Void> inheritAll() {
-        return predefined(PredefinedStreamControl.builder().inheritStdin().inheritStderr().inheritStdout().build(), StreamContexts::noOutput);
+    public static NonCapturingStreamContext<? extends StreamControl> inheritAll() {
+        return predefinedNonCapturing(PredefinedStreamControl.builder().inheritStdin().inheritStderr().inheritStdout().build());
     }
 
     public static class FileStreamControl implements StreamControl {

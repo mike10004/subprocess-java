@@ -72,7 +72,6 @@ public class SubprocessPipingTest extends SubprocessTestBase {
     @SuppressWarnings("Duplicates")
     @Test
     public void listen_pipeClass() throws Exception {
-        org.apache.commons.io.input.TeeInputStream.class.getName();
         File wastelandFile = writePoemToFile();
         ByteBucket stderrBucket = ByteBucket.create();
         StreamPipeSink stdoutPipe = new StreamPipeSink();
