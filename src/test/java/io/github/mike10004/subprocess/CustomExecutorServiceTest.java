@@ -18,18 +18,22 @@ import org.junit.rules.Timeout;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import static io.github.mike10004.subprocess.Preconditions.checkState;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CustomExecutorServiceTest {
 
     @Rule
-    public final Timeout timeout = TimeoutRules.from(Tests.Settings).getLongRule();
+    public final Timeout timeout = TimeoutRules.from(Tests.Settings).getMediumRule();
 
     @ClassRule
     public static final TemporaryFolder tempFolder = new TemporaryFolder();
@@ -37,24 +41,28 @@ public class CustomExecutorServiceTest {
     @Test
     public void testCustomExecutorService() throws Exception {
         File pidFile = File.createTempFile("nht_pid_file", ".pid", tempFolder.newFolder());
-        Executor directExecutor = MoreExecutors.directExecutor();
         AtomicInteger callbackInvocations = new AtomicInteger(0);
-        ProcessResult<?, ?> result;
+        ProcessResult<String, String> result;
         try (ScopedProcessTracker processTracker = new ScopedProcessTracker()) {
             Subprocess subprocess = Tests.runningPythonFile(Tests.pySignalListener())
                     .args("--pidfile", pidFile.getAbsolutePath())
                     .build();
-            Supplier<ListeningExecutorService> executorServiceSupplier = ExecutorServices.newTransformedSingleThreadExecutorServiceFactory("unit-test-pool", MoreExecutors::listeningDecorator);
-            ProcessMonitor<?, ?> monitor = subprocess.launcher(new ListenableSubprocessLauncher(processTracker, executorServiceSupplier))
+            AtomicReference<ListeningExecutorService> executorServiceRef = new AtomicReference<>();
+            Supplier<ListeningExecutorService> executorServiceSupplier = () -> {
+                Supplier<ExecutorService> ess = ExecutorServices.newSingleThreadExecutorServiceFactory("unit-tests");
+                ListeningExecutorService less = MoreExecutors.listeningDecorator(ess.get());
+                Object expectedNull = executorServiceRef.getAndSet(less);
+                checkState(expectedNull == null);
+                return less;
+            };
+            ProcessMonitor<String, String> monitor = subprocess.launcher(new ListenableSubprocessLauncher(processTracker, executorServiceSupplier))
                 .outputStrings(Charset.defaultCharset())
                 .launch();
             System.out.format("launched %s%nwaiting for pid to appear in %s%n", subprocess, pidFile);
             int pid = Tests.waitForSignalListenerPid(pidFile);
             System.out.format("saw pid %d%n", pid);
-            Future<?> future = monitor.future();
-            assertTrue("expect is ListenableFuture: " + future, future instanceof ListenableFuture);
-            ListenableFuture<?> lFuture = (ListenableFuture<?>) future;
-            Futures.addCallback(lFuture, new FutureCallback<Object>() {
+            ListenableFuture<ProcessResult<String, String>> future = (ListenableFuture<ProcessResult<String, String>>) monitor.future();
+            Futures.addCallback(future, new FutureCallback<Object>() {
                 @Override
                 public void onSuccess(@Nullable Object result) {
                     always(result, null);
@@ -70,9 +78,15 @@ public class CustomExecutorServiceTest {
                     System.out.format("thread=%s: result=%s; failure=%s%n", Thread.currentThread().getName(), result, failure);
                 }
 
-            }, directExecutor);
+            }, Runnable::run);
             monitor.destructor().sendTermSignal().await(5, TimeUnit.SECONDS);
-            result = monitor.await(0, TimeUnit.SECONDS);
+            assertFalse("expect process to be terminated", monitor.process().isAlive());
+            monitor.await(0, TimeUnit.SECONDS);
+            assertTrue("expect future is done", future.isDone());
+            result = future.get();
+            // callbacks will have executed after executor service completes
+            boolean terminated = executorServiceRef.get().awaitTermination(5, TimeUnit.SECONDS);
+            assertTrue("expect terminated", terminated);
         }
         assertEquals("expect callback invoked exactly once", 1, callbackInvocations.get());
         Tests.dump(result, System.out, System.out);
