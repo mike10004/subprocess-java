@@ -64,14 +64,15 @@ public class BasicSubprocessLauncher implements SubprocessLauncher {
         }
         // a one-time use executor service; it is shutdown immediately after exactly one task is submitted
         ExecutorService launchExecutorService = launchExecutorServiceFactory.get();
-        ProcessExecution<SO, SE> execution = new ProcessMissionControl(subprocess, processTracker, launchExecutorService)
+        StreamAttachmentSignal streamAttachmentSignal = new StreamAttachmentLatch();
+        ProcessExecution<SO, SE> execution = new ProcessMissionControl(subprocess, processTracker, streamAttachmentSignal, launchExecutorService)
                 .launch(streamControl, exitCode -> {
                     StreamContent<SO, SE> content = streamContext.transform(exitCode, streamControl);
                     return ProcessResult.direct(exitCode, content);
                 });
         Future<ProcessResult<SO, SE>> fullResultFuture = execution.getFuture();
         launchExecutorService.shutdown(); // previously submitted tasks are executed
-        ProcessMonitor<SO, SE> monitor = new BasicProcessMonitor<>(execution.getProcess(), fullResultFuture, processTracker);
+        ProcessMonitor<SO, SE> monitor = new BasicProcessMonitor<>(execution.getProcess(), fullResultFuture, processTracker, streamAttachmentSignal);
         return monitor;
     }
 

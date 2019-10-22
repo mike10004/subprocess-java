@@ -1,5 +1,5 @@
 /*
- * (most of this code is from Ant's PumpStreamHandler}
+ * (most of this code is from Ant's PumpStreamHandler)
  *
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
@@ -20,7 +20,6 @@
 package io.github.mike10004.subprocess;
 
 import javax.annotation.Nullable;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,9 +40,9 @@ class StreamConduit {
 
     /**
      * Construct a new <code>PumpStreamHandler</code>.
-     * @param out the output <code>OutputStream</code>.
-     * @param err the error <code>OutputStream</code>.
-     * @param input the input <code>InputStream</code>.
+     * @param out the output <code>OutputStream</code> where process standard output content is to be directed.
+     * @param err the error <code>OutputStream</code> where process standard error content is to be directed
+     * @param input the input <code>InputStream</code> that is to be fed to process as standard input, or null
      */
     public StreamConduit(OutputStream out, OutputStream err, @Nullable InputStream input) {
         this.out = out;
@@ -85,7 +84,11 @@ class StreamConduit {
     }
 
     /**
-     * Start the <code>Thread</code>s.
+     * Start the threads that pump input and output to and from the process.
+     * @param stdin stream that feeds process standard input
+     * @param stdout stream supplying the contents of process standard output
+     * @param stderr stream supplying the contents of process standard error
+     * @return a resource instance that will stop the threads when closed
      */
     public java.io.Closeable connect(OutputStream stdin, InputStream stdout, InputStream stderr) {
         setProcessInputStream(stdin);
@@ -96,12 +99,7 @@ class StreamConduit {
         if (inputThread != null) {
             inputThread.start();
         }
-        return new Closeable() {
-            @Override
-            public void close() {
-                stop();
-            }
-        };
+        return this::stop;
     }
 
     /**

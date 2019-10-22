@@ -66,5 +66,10 @@ public class SubprocessLaunchSupportTest {
         public ProcessResult<SO, SE> await() throws SubprocessException {
             return result;
         }
+
+        @Override
+        public boolean awaitStreamsAttached(long timeout, TimeUnit unit) {
+            return true;
+        }
     }
 }

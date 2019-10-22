@@ -32,11 +32,13 @@ class ProcessMissionControl {
     private final ExecutorService terminationWaitingService;
     private final Subprocess program;
     private final ProcessTracker processTracker;
+    private final StreamAttachmentSignal streamAttachmentSignal;
 
-    public ProcessMissionControl(Subprocess program, ProcessTracker processTracker, ExecutorService terminationWaitingService) {
-        this.program = requireNonNull(program);
-        this.processTracker = requireNonNull(processTracker);
-        this.terminationWaitingService = requireNonNull(terminationWaitingService);
+    public ProcessMissionControl(Subprocess program, ProcessTracker processTracker, StreamAttachmentSignal streamAttachmentSignal, ExecutorService terminationWaitingService) {
+        this.program = requireNonNull(program, "program");
+        this.processTracker = requireNonNull(processTracker, "processTracker");
+        this.streamAttachmentSignal = requireNonNull(streamAttachmentSignal, "streamAttachmentSignal");
+        this.terminationWaitingService = requireNonNull(terminationWaitingService, "terminationWaitingService");
     }
 
     public <SO, SE> ProcessExecution<SO, SE> launch(StreamControl streamControl, Function<? super Integer, ? extends ProcessResult<SO, SE>> resultTransform) {
@@ -156,6 +158,7 @@ class ProcessMissionControl {
             processStdout = process.getInputStream();
             processStderr = process.getErrorStream();
             try (Closeable ignore = conduit.connect(processStdin, processStdout, processStderr)) {
+                streamAttachmentSignal.notifyStreamsAttached();
                 exitVal = waitFor(process);
                 if (exitVal != null) {
                     terminated = true;

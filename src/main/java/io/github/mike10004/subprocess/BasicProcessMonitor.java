@@ -17,11 +17,13 @@ class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
     private final Process process;
     private final Future<ProcessResult<SO, SE>> future;
     private final ProcessTracker processTracker;
+    private final StreamAttachmentSignal streamAttachmentSignal;
 
-    BasicProcessMonitor(Process process, Future<ProcessResult<SO, SE>> future, ProcessTracker processTracker) {
+    public BasicProcessMonitor(Process process, Future<ProcessResult<SO, SE>> future, ProcessTracker processTracker, StreamAttachmentSignal streamAttachmentSignal) {
         this.future = requireNonNull(future);
         this.process = requireNonNull(process);
         this.processTracker = requireNonNull(processTracker);
+        this.streamAttachmentSignal = requireNonNull(streamAttachmentSignal);
     }
 
     @Override
@@ -65,4 +67,10 @@ class BasicProcessMonitor<SO, SE> implements ProcessMonitor<SO, SE> {
             throw new SubprocessExecutionException(e.getCause());
         }
     }
+
+    @Override
+    public boolean awaitStreamsAttached(long timeout, TimeUnit unit) throws InterruptedException {
+        return streamAttachmentSignal.await(timeout, unit);
+    }
+
 }

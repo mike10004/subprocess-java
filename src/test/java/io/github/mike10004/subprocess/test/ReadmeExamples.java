@@ -200,7 +200,7 @@ public class ReadmeExamples {
 
                 @Override
                 public OutputStream openStderrSink() {
-                    return System.err; // in real life, wrap this with CloseShieldOutputStream to avoid closing JVM stderr
+                    return System.err; // in real life, you should wrap this with CloseShieldOutputStream to avoid closing JVM stderr
                 }
 
                 @Nullable
@@ -230,6 +230,8 @@ public class ReadmeExamples {
                         .launcher(processTracker)
                         .output(ctx)
                         .launch();
+                // Wait for the pipe to be connected; in real life, you should throw exception if this returns false
+                monitor.awaitStreamsAttached(5, TimeUnit.SECONDS);
                 // connect a reader to the piped input stream and echo the process output
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(pipeInput, US_ASCII))) {
                     String line;

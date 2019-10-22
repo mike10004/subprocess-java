@@ -62,4 +62,14 @@ public interface ProcessMonitor<SO, SE> {
      * @throws SubprocessExecutionException if an execution exception is thrown on the process execution thread
      */
     ProcessResult<SO, SE> await() throws InterruptedException, SubprocessExecutionException;
+
+    /**
+     * Blocks on this thread until all streams have been attached to the process.
+     * @param timeout the timeout
+     * @param unit the timeout unit
+     * @return true if streams are attached or become attached before the timeout elapses, false otherwise
+     * @throws InterruptedException if interrupted while blocking
+     */
+    boolean awaitStreamsAttached(long timeout, TimeUnit unit) throws InterruptedException;
+
 }

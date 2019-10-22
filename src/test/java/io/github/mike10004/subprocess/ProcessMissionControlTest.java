@@ -17,13 +17,24 @@ public class ProcessMissionControlTest {
 
     private static final ProcessTracker PROCESS_TRACKER = new ShutdownHookProcessTracker();
 
+    private static final StreamAttachmentSignal INACTIVE_SIGNAL = new StreamAttachmentSignal() {
+        @Override
+        public void notifyStreamsAttached() {
+        }
+
+        @Override
+        public boolean await(long duration, TimeUnit unit) throws InterruptedException {
+            return false;
+        }
+    };
+
     @Test
     public void launch() throws ExecutionException, InterruptedException {
         String expected = "hello";
         Subprocess subprocess = Subprocess.running("echo")
                 .args(expected)
                 .build();
-        ProcessMissionControl executor = new ProcessMissionControl(subprocess, PROCESS_TRACKER, createExecutorService());
+        ProcessMissionControl executor = new ProcessMissionControl(subprocess, PROCESS_TRACKER, INACTIVE_SIGNAL, createExecutorService());
         ByteBucket stdout = ByteBucket.create(), stderr = ByteBucket.create();
         PredefinedStreamControl endpoints = new PredefinedStreamControl(stdout, stderr, null);
         ProcessExecution<?, ?> execution = executor.launch(endpoints, exitCode -> ProcessResult.direct(exitCode, null, null));
@@ -39,7 +50,7 @@ public class ProcessMissionControlTest {
         Subprocess subprocess = Subprocess.running("echo")
                 .args(expected)
                 .build();
-        ProcessMissionControl executor = new ProcessMissionControl(subprocess, PROCESS_TRACKER, createExecutorService());
+        ProcessMissionControl executor = new ProcessMissionControl(subprocess, PROCESS_TRACKER, INACTIVE_SIGNAL, createExecutorService());
         @SuppressWarnings("unchecked")
         StreamContext<StreamContexts.BucketContext, StreamInput, StreamInput> ctrl = (StreamContext<StreamContexts.BucketContext, StreamInput, StreamInput>) StreamContexts.memoryByteSources(null);
         StreamControl outputcontext = ctrl.produceControl();
@@ -59,7 +70,7 @@ public class ProcessMissionControlTest {
         byte[] input = { 1, 2, 3, 4 };
         Subprocess subprocess = Tests.runningPythonFile("nht_length.py")
                 .build();
-        ProcessMissionControl executor = new ProcessMissionControl(subprocess, PROCESS_TRACKER, createExecutorService());
+        ProcessMissionControl executor = new ProcessMissionControl(subprocess, PROCESS_TRACKER, INACTIVE_SIGNAL, createExecutorService());
         ByteBucket stdoutBucket = ByteBucket.create();
         PredefinedStreamControl endpoints = PredefinedStreamControl.builder()
                 .stdin(StreamInput.wrap(input))
