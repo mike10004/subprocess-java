@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3
+---
+
+* make it easier to tail output
+* provide a method to wait for streams to attach to process
+
 0.2
 ---
 
