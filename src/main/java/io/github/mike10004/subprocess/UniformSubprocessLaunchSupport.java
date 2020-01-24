@@ -6,7 +6,7 @@ import java.util.function.Function;
  * Class that represents launch support with a uniform stream context.
  * @param <S> type of captured standard output and standard error content
  */
-public final class UniformSubprocessLaunchSupport<S> extends SubprocessLaunchSupport<S, S> {
+public class UniformSubprocessLaunchSupport<S> extends SubprocessLaunchSupport<S, S> {
 
     UniformSubprocessLaunchSupport(Subprocess subprocess, SubprocessLauncher launcher, StreamContext<?, S, S> streamContext) {
         super(subprocess, launcher, streamContext);

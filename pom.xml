@@ -19,12 +19,19 @@
         <skip.surefire.tests>false</skip.surefire.tests>
         <slf4j.version>1.7.25</slf4j.version>
         <python.executable>python</python.executable>
+        <trialsPerTest>1</trialsPerTest>
     </properties>
     <profiles>
         <profile>
             <id>skip-tests</id>
             <properties>
                 <skip.surefire.tests>true</skip.surefire.tests>
+            </properties>
+        </profile>
+        <profile>
+            <id>num-trials-10</id>
+            <properties>
+                <trialsPerTest>10</trialsPerTest>
             </properties>
         </profile>
         <profile>
@@ -120,6 +127,7 @@
                         <skipTests>${skip.surefire.tests}</skipTests>
                         <systemPropertyVariables>
                             <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
+                            <subprocess.tests.trials>${trialsPerTest}</subprocess.tests.trials>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>

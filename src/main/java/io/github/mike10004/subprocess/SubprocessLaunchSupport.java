@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
@@ -131,7 +132,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * @return a new launch support instance
      */
     @SuppressWarnings("unused")
-    public SubprocessLaunchSupport<Void, Void> inheritAllStreams() {
+    public UniformSubprocessLaunchSupport<Void> inheritAllStreams() {
         return output(StreamContexts.inheritAll());
     }
 
@@ -140,7 +141,7 @@ public class SubprocessLaunchSupport<SO, SE> {
      * but does not write anything on the process standard input stream.
      * @return a new launch support instance
      */
-    public SubprocessLaunchSupport<Void, Void> inheritOutputStreams() {
+    public UniformSubprocessLaunchSupport<Void> inheritOutputStreams() {
         return output(StreamContexts.inheritOutputs());
     }
 
@@ -187,6 +188,26 @@ public class SubprocessLaunchSupport<SO, SE> {
      */
     public UniformSubprocessLaunchSupport<File> outputTempFiles(Path directory, @Nullable StreamInput stdin) {
         return output(StreamContexts.outputTempFiles(directory, stdin));
+    }
+
+    /**
+     * Returns a new launcher that consumes process output on threads started by an executor service.
+     * @param tailThreadExecutorService the executor service that is to start the threads
+     * @param streamTailer a stream tailer
+     * @return a new launch support instance
+     */
+    public TailingLaunchSupport tailing(ExecutorService tailThreadExecutorService, StreamTailer streamTailer) {
+        return tailing(tailThreadExecutorService, streamTailer, null);
+    }
+
+    /**
+     * Returns a new launcher that consumes process output on threads started by an executor service.
+     * @param tailThreadExecutorService the executor service that is to start the threads
+     * @param streamTailer a stream tailer
+     * @return a new launch support instance
+     */
+    public TailingLaunchSupport tailing(ExecutorService tailThreadExecutorService, StreamTailer streamTailer, @Nullable StreamInput stdin) {
+        return new TailingLaunchSupport(subprocess, launcher, new StreamTailerContext(stdin), tailThreadExecutorService, streamTailer);
     }
 
 }

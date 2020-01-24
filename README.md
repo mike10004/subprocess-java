@@ -21,7 +21,7 @@ Include the dependency with
     <dependency>
         <groupId>com.github.mike10004</groupId>
         <artifactId>subprocess</artifactId>
-        <version>0.3</version>
+        <version>0.4-SNAPSHOT</version>
     <dependency>
 
 and use  
@@ -103,7 +103,6 @@ unfortunate inconsistency.)
 
 ### Launch process and tail output
 
-    LineConsumerContext ctx = new LineConsumerContext();
     Consumer<String> filter = line -> {
         if (Integer.parseInt(line) % 2 == 0) {
             System.out.print(line + " ");
@@ -111,17 +110,17 @@ unfortunate inconsistency.)
     };
     ExecutorService executorService = Executors.newFixedThreadPool(2);
     try (ScopedProcessTracker processTracker = new ScopedProcessTracker()) {
+        StreamTailer tailer = StreamTailer.builder(Charset.defaultCharset())
+                .stdoutConsumer(filter)
+                .build();
         // launch a process that prints a number every second
         ProcessMonitor<Void, Void> monitor = Subprocess.running("bash")
                 .arg("-c")
                 .arg("set -e; for N in $(seq 5) ; do sleep 0.5 ; echo $N ; done")
                 .build()
                 .launcher(processTracker)
-                .output(ctx)
+                .tailing(executorService, tailer)
                 .launch();
-        // Wait for the pipe to be connected; in real life, you should throw an exception if this returns false
-        monitor.awaitStreamsAttached(5, TimeUnit.SECONDS);
-        ctx.startRelaying(executorService, filter, ignore -> {});
         monitor.await();
     }
     // prints: 2 4

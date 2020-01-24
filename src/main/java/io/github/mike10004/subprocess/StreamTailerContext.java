@@ -22,35 +22,29 @@ import static io.github.mike10004.subprocess.Preconditions.checkState;
  * Instances of this class must not be reused as arguments to
  * {@link SubprocessLaunchSupport#output(StreamContext)}.
  */
-public class LineConsumerContext implements NonCapturingStreamContext<StreamControl> {
+public class StreamTailerContext implements NonCapturingStreamContext<StreamControl> {
 
     private transient volatile LineConsumerControl control;
+
+    @Nullable
+    private final StreamInput stdinSource;
 
     /**
      * Constructs an instance of the class class.
      * The {@link #produceControl()} method may be invoked at most once on an instance of this class.
      */
-    public LineConsumerContext() {
+    public StreamTailerContext() {
+        this(null);
+    }
+
+    public StreamTailerContext(@Nullable StreamInput stdinSource) {
+        this.stdinSource = stdinSource;
     }
 
     @Override
     public StreamControl produceControl() {
         checkState(control == null, "control has already been produced by this stream context instance; do not reuse these instances");
         return control = new LineConsumerControl();
-    }
-
-    /**
-     * Start relaying process output lines, decoding process output using the platform default charset.
-     *
-     * @param relayExecutorService executor service to which standard output and standard error relay loops
-     * are to be submitted
-     * @param stdoutConsumer consumer of lines printed on process standard output
-     * @param stderrConsumer consumer of lines printed on process standard error
-     * @see #startRelaying(ExecutorService, Charset, Consumer, Consumer)
-     */
-    public void startRelaying(ExecutorService relayExecutorService, Consumer<String> stdoutConsumer, Consumer<String> stderrConsumer) {
-        Charset outputCharset = Charset.defaultCharset();
-        startRelaying(relayExecutorService, outputCharset, stdoutConsumer, stderrConsumer);
     }
 
     /**
@@ -70,7 +64,7 @@ public class LineConsumerContext implements NonCapturingStreamContext<StreamCont
      * @param stderrConsumer consumer of lines printed on process standard error
      * @see #startRelaying(ExecutorService, Charset, Consumer, Consumer)
      */
-    public void startRelaying(ExecutorService relayExecutorService, Charset outputCharset, Consumer<String> stdoutConsumer, Consumer<String> stderrConsumer) {
+    public void startRelaying(ExecutorService relayExecutorService, Charset outputCharset, Consumer<? super String> stdoutConsumer, Consumer<? super String> stderrConsumer) {
         checkState(control != null, "control not yet created; obtain true result from ProcessMonitor.awaitStreamsAttached() first");
         InputStream stdoutSource = control.getStdoutStream();
         relayExecutorService.submit(new LineRelayer(stdoutConsumer, stdoutSource, outputCharset));
@@ -80,11 +74,11 @@ public class LineConsumerContext implements NonCapturingStreamContext<StreamCont
 
     private static class LineRelayer implements Callable<Void> {
 
-        private final Consumer<String> consumer;
+        private final Consumer<? super String> consumer;
         private final InputStream in;
         private final Charset charset;
 
-        public LineRelayer(Consumer<String> consumer, InputStream in, Charset charset) {
+        public LineRelayer(Consumer<? super String> consumer, InputStream in, Charset charset) {
             this.consumer = consumer;
             this.in = in;
             this.charset = charset;
@@ -133,8 +127,11 @@ public class LineConsumerContext implements NonCapturingStreamContext<StreamCont
 
         @Nullable
         @Override
-        public InputStream openStdinSource() {
-            return LineConsumerContext.this.openStdinSourceForControl();
+        public InputStream openStdinSource() throws IOException {
+            if (stdinSource == null) {
+                return null;
+            }
+            return stdinSource.openStream();
         }
 
         public InputStream getStdoutStream() {
@@ -152,14 +149,4 @@ public class LineConsumerContext implements NonCapturingStreamContext<StreamCont
         }
     }
 
-    /**
-     * Returns the input stream instance used to pass data to the process's standard input.
-     * By default, this method returns null, which means no data is to be fed to the process.
-     * This method may be overridden to provide a data to the process.
-     * @return a new input stream, or null
-     */
-    @Nullable
-    protected InputStream openStdinSourceForControl() {
-        return null;
-    }
 }
