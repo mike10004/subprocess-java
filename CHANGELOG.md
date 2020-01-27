@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.4
+---
+
+* improve output tailing API
+
 0.3
 ---
 
